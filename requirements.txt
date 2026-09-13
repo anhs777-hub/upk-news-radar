@@ -1,0 +1,4 @@
+feedparser>=6.0.10
+python-dateutil>=2.8.2
+sentence-transformers>=2.7.0
+numpy>=1.24

@@ -1,0 +1,910 @@
+{
+  "_comment": "떡상 감시기 다분류 config. categories 배열의 각 분류가 자기 채널목록+기준을 가진다. 언론사는 분류 중 하나. radar.py newsradar --category <id> 로 실행.",
+  "defaults": {
+    "collect_days": 14,
+    "track_threshold": 10000,
+    "score_base": 100000,
+    "min_long_sec": 180,
+    "max_results_per_channel": 30
+  },
+  "categories": [
+    {
+      "id": "media",
+      "name": "언론사",
+      "breakout": {
+        "track_threshold": 100000,
+        "collect_days": 3,
+        "max_results_per_channel": 50,
+        "collect_mode": "popular"
+      },
+      "channels": [
+        {
+          "name": "SBS 뉴스",
+          "channel_id": "UCkinYTS9IHqOEwR1Sze2JTw"
+        },
+        {
+          "name": "KBS News",
+          "channel_id": "UCcQTRi69dsVYHN3exePtZ1A"
+        },
+        {
+          "name": "MBCNEWS",
+          "channel_id": "UCF4Wxdo3inmxP-Y59wXDsFw"
+        },
+        {
+          "name": "JTBC News",
+          "channel_id": "UCsU-I-vHLiaMfV_ceaYz5rQ"
+        },
+        {
+          "name": "연합뉴스TV",
+          "channel_id": "UCTHCOPwqNfZ0uiKOvFyhGwg"
+        },
+        {
+          "name": "YTN",
+          "channel_id": "UChlgI3UHCOnwUGzWzbJ3H5w"
+        },
+        {
+          "name": "채널A 뉴스",
+          "channel_id": "UCfq4V1DAuaojnr2ryvWNysw"
+        },
+        {
+          "name": "MBN News",
+          "channel_id": "UCG9aFJTZ-lMCHAiO1KJsirg"
+        },
+        {
+          "name": "비디오머그",
+          "channel_id": "UCMEbRpvuwTbXxGiyDb1mT8w"
+        },
+        {
+          "name": "스브스뉴스",
+          "channel_id": "UCQabORQKQRHP-iUqe-xIFvg"
+        },
+        {
+          "name": "KNN NEWS",
+          "channel_id": "UC1ifSsWUG241rRfK0ezYCgA"
+        },
+        {
+          "name": "MTN 머니투데이방송",
+          "channel_id": "UClErHbdZKUnD1NyIUeQWvuQ"
+        }
+      ]
+    },
+    {
+      "id": "economy",
+      "name": "경제",
+      "breakout": {
+        "track_threshold": 10000,
+        "hot_views": 100000
+      },
+      "channels": [
+        {
+          "name": "경제왕토끼",
+          "channel_id": "UCAjzp7zDnyxMqR3kOfFd78g"
+        },
+        {
+          "name": "안경 경제학",
+          "channel_id": "UCJG9mwOwrHpNZRalbZjkk_g"
+        },
+        {
+          "name": "경제석사",
+          "channel_id": "UC3N_Kz5AYR7dkrPZHz0q83w"
+        },
+        {
+          "name": "판이 바뀐다",
+          "channel_id": "UCwja0U9mx3QiuZ1y7VVXtGg"
+        },
+        {
+          "name": "또박경제",
+          "channel_id": "UCdO4PK4YGt3kWavoPqwZt8Q"
+        },
+        {
+          "name": "세계경제 돋보기",
+          "channel_id": "UCMyh92T40NDc9KU48fwvZ1g"
+        },
+        {
+          "name": "일등경제",
+          "channel_id": "UCLjD99jX6LOYWeFZLQQNHTg"
+        },
+        {
+          "name": "똑똑한 경제노트",
+          "channel_id": "UCPG6xOcqyEYwl9zronq277Q"
+        },
+        {
+          "name": "지식한입",
+          "channel_id": "UCi9Sl8GnFdYoqEVXnojBPJw"
+        },
+        {
+          "name": "옳지경제학",
+          "channel_id": "UCxnTNlWLsHrQaJT0D6wOTYg"
+        },
+        {
+          "name": "나는나는경제",
+          "channel_id": "UCQ1UbccNzpM0jl6uJGYb-ww"
+        },
+        {
+          "name": "돈쌤",
+          "channel_id": "UC2cK_Ddzg1FwP2hl32nmz_A"
+        },
+        {
+          "name": "경제집현전",
+          "channel_id": "UC5VoIz0BtmONwJom-edmLiw"
+        },
+        {
+          "name": "경제야 고맙다",
+          "channel_id": "UCMUaLd3PpogS-v_NvroZV9A"
+        },
+        {
+          "name": "얄궂은 경제학",
+          "channel_id": "UC2JEVexKegalan4xSKjVQ0g"
+        },
+        {
+          "name": "경제판도",
+          "channel_id": "UCjCsshhp4hP_9_5HEYwa7fA"
+        },
+        {
+          "name": "경제학 똑똑",
+          "channel_id": "UC2aLhOkPPZEfxTGV7OqffbQ"
+        },
+        {
+          "name": "킁킁경제학",
+          "channel_id": "UCUPy3BZ0udWt2Fij1EdjtIg"
+        },
+        {
+          "name": "경제탐험가",
+          "channel_id": "UC5hwbRRuNY7wP2oFwkbeSng"
+        },
+        {
+          "name": "월드 뉴스",
+          "channel_id": "UCchbsGwVuFnnCputJ-63pGA"
+        },
+        {
+          "name": "새싹경제학",
+          "channel_id": "UCErWbbR5conEAOj_i2wUNWQ"
+        },
+        {
+          "name": "세상해설소",
+          "channel_id": "UCskY2hb_QQrqLhCipN4MDVQ"
+        },
+        {
+          "name": "경제해적단",
+          "channel_id": "UCn49LSg2JSP-9rXV5G2kt4A"
+        },
+        {
+          "name": "돈나침반",
+          "channel_id": "UCUq5sK4WLo-Ags49lRKjU6A"
+        },
+        {
+          "name": "오늘의 지식지도",
+          "channel_id": "UC6Qf2Sz4pn3Ox_lW87o2AQQ"
+        },
+        {
+          "name": "경제참모TV",
+          "channel_id": "UCvpKOC--dFtCGeRxlYQwIEA"
+        },
+        {
+          "name": "지식젠틀맨",
+          "channel_id": "UCn0ZvQSYWVCJlyTFQDLhcuQ"
+        },
+        {
+          "name": "부자아빠의 경제학",
+          "channel_id": "UChUIo6kavReZaRCIj_reZvg"
+        },
+        {
+          "name": "누네띠네 경제학",
+          "channel_id": "UCGJpC3KxPtAmEpUR1m3SitQ"
+        },
+        {
+          "name": "나무 경제학",
+          "channel_id": "UCSdg9fki-H0TkPtHOfjnYJQ"
+        },
+        {
+          "name": "경제냥",
+          "channel_id": "UCkbv6PelEPV-nvQ8kEErGPg"
+        },
+        {
+          "name": "돈의 맥락",
+          "channel_id": "UCeFiKG5t8-yIRiXW4cMj6fA"
+        },
+        {
+          "name": "김싸부경제학",
+          "channel_id": "UCQuzfVeVR_2fnJImIv6GU6w"
+        },
+        {
+          "name": "월급쟁이경제학",
+          "channel_id": "UCaoWrxK3k07j68BszFHJakQ"
+        },
+        {
+          "name": "날아라경제",
+          "channel_id": "UCjluBskNT8z-K1JJnYQ0J1Q"
+        },
+        {
+          "name": "한입 경제학",
+          "channel_id": "UCbcmGI0HSdyBQT3yEdmYUpw"
+        },
+        {
+          "name": "경제담론",
+          "channel_id": "UCOiRCmnv_nX2ypat6DNRhmQ"
+        },
+        {
+          "name": "K경제전쟁",
+          "channel_id": "UCgKj67DtxWM3DkvSu1fL3Mw"
+        },
+        {
+          "name": "냠냠경제",
+          "channel_id": "UCkoxtNKdyRCf3LxfrvZIUTA"
+        },
+        {
+          "name": "손바닥경제",
+          "channel_id": "UCju_tjw3QV15l6B6ZvCygBA"
+        },
+        {
+          "name": "청춘 부동산",
+          "channel_id": "UC2qy9fzBKyYQyZHpW-V2x6g"
+        },
+        {
+          "name": "지식코드",
+          "channel_id": "UCD-hui0lRQfBGOHGSkUsHsA"
+        },
+        {
+          "name": "성실경제학",
+          "channel_id": "UC2yALkOs2FomlJW3KY1tz5Q"
+        },
+        {
+          "name": "알짜경제학",
+          "channel_id": "UCuean56gdiJOLeiA2fKusyQ"
+        },
+        {
+          "name": "박기자의 심층분석",
+          "channel_id": "UCj3R-Jjdjek2Z1js_ZGAxLg"
+        },
+        {
+          "name": "세계사뒷문",
+          "channel_id": "UCOGjo9JE4nXUy_S-9WQYoyA"
+        },
+        {
+          "name": "똑똑한 경제학",
+          "channel_id": "UCRwGtAIx3HXTx6HjDho0cCw"
+        },
+        {
+          "name": "경제디텍터",
+          "channel_id": "UCUHOSB5sg1AgLr7I3EnxphQ"
+        },
+        {
+          "name": "코믹스 경제",
+          "channel_id": "UCY4FGn0d7ltiW6GDypGnaMA"
+        },
+        {
+          "name": "지식발굴단",
+          "channel_id": "UCrVqJnckVKzUAvzmk1rgElQ"
+        },
+        {
+          "name": "만화 경제학",
+          "channel_id": "UCOrRuK7IJq1a7scuEPYIm3w"
+        },
+        {
+          "name": "머니클래스 - 경제적 자유를 향하여",
+          "channel_id": "UCNLRGd_UrF31wirXhX16eJQ"
+        },
+        {
+          "name": "생각의 경제학",
+          "channel_id": "UCuUmce84q387L3RtxuGM-7g"
+        },
+        {
+          "name": "칩스앤뉴스",
+          "channel_id": "UCU9Zb3X-UOVEy1I_pgyeK5g"
+        },
+        {
+          "name": "비밀의경제학",
+          "channel_id": "UCNKwvJNP9GMo8Hs2e5IQPzQ"
+        },
+        {
+          "name": "경제읽음이",
+          "channel_id": "UCVc2lEXhZ9-xogfmjQZ9P2w"
+        },
+        {
+          "name": "쉬운경제학",
+          "channel_id": "UCO74-ZBoJMIgN1SbmTQV-rg"
+        },
+        {
+          "name": "세계경제이야기",
+          "channel_id": "UCfOhunfxnhP8H5bkNIXcg8g"
+        },
+        {
+          "name": "이매탈 경제TV",
+          "channel_id": "UCCpD7zHThflnE5A3ee4I9-w"
+        },
+        {
+          "name": "경제로그",
+          "channel_id": "UCj7fOkscZcRo4vUBudnRjRg"
+        },
+        {
+          "name": "경제초고수",
+          "channel_id": "UCXwOVioPSL6T3mBvcGFuOYg"
+        },
+        {
+          "name": "지식왕천재",
+          "channel_id": "UCn222kwFLDyPzh1ARzLe-tA"
+        },
+        {
+          "name": "집구석 경제학",
+          "channel_id": "UCdA_ovMcYiNgbkf4624Tbxw"
+        },
+        {
+          "name": "다모아 경제한입",
+          "channel_id": "UCxsdQPulr-D5MyC-emextUA"
+        },
+        {
+          "name": "똑똑하게 돈 벌기",
+          "channel_id": "UCEDbet_4cQqo5_8Yw2ermKg"
+        },
+        {
+          "name": "사또의 경제 이야기",
+          "channel_id": "UCYTzG803E2YrAXsmc56Jv4g"
+        },
+        {
+          "name": "원가 공개 경제학",
+          "channel_id": "UC092e5GLtfXQMFRCoJYB0lw"
+        },
+        {
+          "name": "알고싶은경제학",
+          "channel_id": "UCO42fLoLMxCOzs6P6VjApXA"
+        },
+        {
+          "name": "지식 브런치",
+          "channel_id": "UCcYk_KPZZMLv_bcaSAWSSxA"
+        },
+        {
+          "name": "경제화이팅",
+          "channel_id": "UCInJSOkTvEwmjzuOM0uAepQ"
+        },
+        {
+          "name": "한국 경제 브리핑",
+          "channel_id": "UCJnOcuvh0muRMIoc65EjVUg"
+        },
+        {
+          "name": "당신의 지식백과",
+          "channel_id": "UCnralZf6HjhNQuFxJyIYwLA"
+        },
+        {
+          "name": "부자의 경제학",
+          "channel_id": "UC9fMEBHAqyi_W0Tqc2QszFw"
+        },
+        {
+          "name": "간단경제한스푼",
+          "channel_id": "UChuu3KaoDnyttfN10GG169Q"
+        },
+        {
+          "name": "똑똑해지는 경제학",
+          "channel_id": "UCjSZSpjHEyuKwwa8U9_Faqw"
+        },
+        {
+          "name": "푸짐한 경제학",
+          "channel_id": "UCk1xIGPS2Sory5JT-oc74zQ"
+        },
+        {
+          "name": "깊은 경제",
+          "channel_id": "UCu4AJeb4Uv9OkqiabTJ13DQ"
+        },
+        {
+          "name": "소름돋는 경제학",
+          "channel_id": "UCb6Loqkzz-EaFryCL51n5Mg"
+        },
+        {
+          "name": "섬뜩한경제학",
+          "channel_id": "UC0kGmibYdcvHeHVFbq1OagA"
+        },
+        {
+          "name": "돈냄새 경제학",
+          "channel_id": "UCIMbYMOydA2UvDqIm9PIn4Q"
+        },
+        {
+          "name": "방구석 경제학",
+          "channel_id": "UC7MYJo2LuhYBodjt3BTLyQw"
+        },
+        {
+          "name": "머리가 좋아지는 지박사",
+          "channel_id": "UC4rZP6di8Qd7Rh_CRW9LERw"
+        },
+        {
+          "name": "럭키경제학",
+          "channel_id": "UCVyp8N1xXhPY3yNNjXuiMmw"
+        },
+        {
+          "name": "돈버는 경제학, 돈경",
+          "channel_id": "UCEtvpbXKqH3ERjv8nPcOCoQ"
+        },
+        {
+          "name": "술술 경제학",
+          "channel_id": "UCSxs8gZqWFsEp5fYMyo2Gfw"
+        },
+        {
+          "name": "나만 아는 경제학",
+          "channel_id": "UCMY7ee2GCzhpXbJFL6kHpNg"
+        },
+        {
+          "name": "살아남는경제학",
+          "channel_id": "UCLria0414i_UsTki-vp0O6w"
+        },
+        {
+          "name": "시시한 경제학",
+          "channel_id": "UCYCtOGPkSMWTwwgxe03pnag"
+        },
+        {
+          "name": "보자마자겟",
+          "channel_id": "UCeLO0-QH5Igul0R1Q0isiLw"
+        },
+        {
+          "name": "돈의민족",
+          "channel_id": "UC3FNiJw3RXP9Ae0cDY-wOWg"
+        },
+        {
+          "name": "부자가속 경제학",
+          "channel_id": "UCFsboCo5eEAopIsV-7e4HZg"
+        },
+        {
+          "name": "정경판",
+          "channel_id": "UC7jPGKvqcdJYp8KiW_cjGrg"
+        },
+        {
+          "name": "탁경제",
+          "channel_id": "UCBy9BR_K3C6ER3EzmooK0Zg"
+        },
+        {
+          "name": "쉬운 경제",
+          "channel_id": "UC_UEDBEEDi_dM-6V9Nde6ew"
+        },
+        {
+          "name": "부엉이 경제노트",
+          "channel_id": "UCJEkr8r8gC3an-6u8QEJfdA"
+        },
+        {
+          "name": "경제톡톡",
+          "channel_id": "UC1cGmVfo9Rr8g7JrXGUVQpg"
+        },
+        {
+          "name": "우리집경제",
+          "channel_id": "UCVtOCP92808Us1Nofbxpwuw"
+        }
+      ],
+      "auto_collect": true
+    },
+    {
+      "id": "psychology",
+      "name": "심리",
+      "breakout": {
+        "track_threshold": 10000,
+        "hot_views": 100000
+      },
+      "channels": [
+        {
+          "name": "바로쓰는 심리학",
+          "channel_id": "UCBCEvvfy9EOoo_l5nX6cPAw"
+        }
+      ],
+      "auto_collect": false
+    },
+    {
+      "id": "history",
+      "name": "역사",
+      "breakout": {
+        "hot_views": 100000
+      },
+      "channels": [],
+      "auto_collect": false
+    },
+    {
+      "id": "science",
+      "name": "과학",
+      "breakout": {
+        "hot_views": 100000
+      },
+      "channels": [],
+      "auto_collect": false
+    },
+    {
+      "id": "yadam",
+      "name": "야담",
+      "breakout": {
+        "hot_views": 100000
+      },
+      "channels": [
+        {
+          "name": "화수분야담",
+          "channel_id": "UC98w-QfWGojXQf6Zh4oMoog"
+        },
+        {
+          "name": "야담방앗간",
+          "channel_id": "UC2Sbs8CSruFUQGhKXWAMzsQ"
+        },
+        {
+          "name": "야담고을",
+          "channel_id": "UCKHHCz2yjmlnFjdkl7SAxrA"
+        },
+        {
+          "name": "매화야담길",
+          "channel_id": "UCGo35ehMZw72OB2dihaI_1w"
+        },
+        {
+          "name": "달토끼야담",
+          "channel_id": "UCfi7icDy6BbnNOqtIeli2xQ"
+        },
+        {
+          "name": "채월야담",
+          "channel_id": "UCIPb5tnAUyWsdj4zNSq11RQ"
+        },
+        {
+          "name": "달빛명월야담",
+          "channel_id": "UCJZCMLgeE5K1IwCp3IkfLCw"
+        },
+        {
+          "name": "노을야담",
+          "channel_id": "UCh9mAn3AH-56_Zrh4C12mqw"
+        },
+        {
+          "name": "천일설화 야담",
+          "channel_id": "UCVMXJxXY9NB0K8EbxfxpFug"
+        },
+        {
+          "name": "소원야담",
+          "channel_id": "UC73zFfoYT0sh7r7NEXBtRaQ"
+        },
+        {
+          "name": "조선야담창고",
+          "channel_id": "UCt-4gtMHr5Yq155P3ozBVXg"
+        },
+        {
+          "name": "보배야담",
+          "channel_id": "UCv4lQoK5ZJHGVx415-NiDpQ"
+        },
+        {
+          "name": "야담동무",
+          "channel_id": "UC57hZQPAAHPx7wjMBg-1bPQ"
+        },
+        {
+          "name": "야담이야기",
+          "channel_id": "UCgkGiGnTzi1jUVRxgMdzXIA"
+        },
+        {
+          "name": "솔잎야담",
+          "channel_id": "UCdx8_M0fLtYpQDnYY-ALWRg"
+        },
+        {
+          "name": "한빛야담",
+          "channel_id": "UCGRT47eVm_TIRWhcbpuGS5w"
+        },
+        {
+          "name": "은솔야담",
+          "channel_id": "UCvJFSsbkUoKZfSllNb5BY_g"
+        },
+        {
+          "name": "소망야담",
+          "channel_id": "UCOlS5leCgyaHUWNWyP7UR2A"
+        },
+        {
+          "name": "야담화원",
+          "channel_id": "UCi8d2XlECUswIlAgau5VQVg"
+        },
+        {
+          "name": "명품야담",
+          "channel_id": "UC_Vj_8vcPsUR4ZjY7p5SusA"
+        },
+        {
+          "name": "팔도야담방",
+          "channel_id": "UCbk1Idboh0qfQ2euy8WFmIA"
+        },
+        {
+          "name": "백제야담",
+          "channel_id": "UCPF2zXlAOqMGjT0rMuxabBQ"
+        },
+        {
+          "name": "뒷골목 야담",
+          "channel_id": "UC932jRu9zsWkJcx0TxaWgNw"
+        },
+        {
+          "name": "옛날이야기 보따리",
+          "channel_id": "UC1fvS93pNotD7P43lATHMOg"
+        },
+        {
+          "name": "야담재인",
+          "channel_id": "UC3Jq33v0JtmWw7PcRmye6_g"
+        },
+        {
+          "name": "달빛잠자리이야기",
+          "channel_id": "UCn3IlbuVTSW34l-MP3RuDRQ"
+        },
+        {
+          "name": "뚱이야담",
+          "channel_id": "UCyiBBQvrF1-7MjISrd7oXCg"
+        },
+        {
+          "name": "혜뚝야담",
+          "channel_id": "UCXhD92yun-rimvVCP6cLGhw"
+        },
+        {
+          "name": "달빛야담",
+          "channel_id": "UCvW-efvzyTO01opeyCWSkpg"
+        },
+        {
+          "name": "시니어오픈북",
+          "channel_id": "UCA0XlekSYQ9ZsS2-wdl0GiA"
+        },
+        {
+          "name": "소월야담",
+          "channel_id": "UCiTBBpBmRnR54hLXj5LtQVQ"
+        },
+        {
+          "name": "복많이받으세요 야담",
+          "channel_id": "UCJIoGPs4zCNRKhIx_I0Oxjw"
+        },
+        {
+          "name": "조선업보록",
+          "channel_id": "UCQPhpMwrBD4UfuEjyW5-oeg"
+        },
+        {
+          "name": "천년전설야담사",
+          "channel_id": "UCVhpoD8jZU1r98OsNNpeNWA"
+        },
+        {
+          "name": "조선제일야담",
+          "channel_id": "UCqP2ZKWY1bVXOlcffPyB9tQ"
+        },
+        {
+          "name": "가인야담",
+          "channel_id": "UCvuVKKtIXIxffrvoLTTjcRw"
+        },
+        {
+          "name": "아랫목야담꾼",
+          "channel_id": "UCRQz93yV3oXKaXZfngj_diw"
+        },
+        {
+          "name": "조선 야담집",
+          "channel_id": "UC6XNR-mQmICyLDDDBQbpxxg"
+        },
+        {
+          "name": "옛날이야기",
+          "channel_id": "UC7Dx8s1iF2SwQTOlMq5K-ig"
+        },
+        {
+          "name": "퇴근길독백",
+          "channel_id": "UChHZJeevxi8143JcFM43lqg"
+        },
+        {
+          "name": "월하야담",
+          "channel_id": "UC_5Xm81nTsHl4pfGSwdYqUw"
+        },
+        {
+          "name": "굿밤야담",
+          "channel_id": "UC3fU_1_IHu6oUVVKUF-fq7w"
+        },
+        {
+          "name": "재벌집사연극장",
+          "channel_id": "UCrmDMkdlnRcsAu7L9deADCQ"
+        },
+        {
+          "name": "산골야담",
+          "channel_id": "UChczrPnaju9mGqxJXMGVX8Q"
+        },
+        {
+          "name": "인생대첩",
+          "channel_id": "UCt077dOvu2mLQN7lFTZLOOg"
+        },
+        {
+          "name": "야담마을",
+          "channel_id": "UCpzwPLTXwJAwu0wbFplcyNQ"
+        },
+        {
+          "name": "별하의 조선야담",
+          "channel_id": "UCueh-e4ZWsAlZRlw9E1AapA"
+        },
+        {
+          "name": "조선 야담",
+          "channel_id": "UC0SB64lKf9GWMOakE6KNGEA"
+        },
+        {
+          "name": "밤의설화 공식",
+          "channel_id": "UCyvjQQbqTKeSm_fy6Sfgciw"
+        },
+        {
+          "name": "달이야담",
+          "channel_id": "UC8g35mvilidLYiWVvftb93A"
+        },
+        {
+          "name": "목단야담",
+          "channel_id": "UCPvs2lSeGGS4CV-vsgBPCQQ"
+        },
+        {
+          "name": "야담헌",
+          "channel_id": "UCyULZWfiP27XjXxYcg6c3iA"
+        },
+        {
+          "name": "송림야담",
+          "channel_id": "UCcV_SLaGHK9ifJEVv5UiMew"
+        },
+        {
+          "name": "전해들은 야담",
+          "channel_id": "UCT57FYHDidN7DREm-ItSuqA"
+        },
+        {
+          "name": "오늘도좋은밤",
+          "channel_id": "UCIrAryWcOnjjiRCNvZ1TF6w"
+        },
+        {
+          "name": "드라마사연",
+          "channel_id": "UCaApUIdlWO-BilVTBMLO8eg"
+        },
+        {
+          "name": "야담집",
+          "channel_id": "UCJiePgRTXdUHMFIr577IB6g"
+        },
+        {
+          "name": "담담소담 민담",
+          "channel_id": "UCJb10-j_C3fcBmtNwHAEIXg"
+        },
+        {
+          "name": "소원야담",
+          "channel_id": "UCTugu3zXia_FMIvqy-BiZTg"
+        },
+        {
+          "name": "손녀야담",
+          "channel_id": "UC3FMKyCPX-Pj33e_34I1nRw"
+        },
+        {
+          "name": "꼬마야담",
+          "channel_id": "UCkuCZHDpOS0LqBkPUpBa5NA"
+        },
+        {
+          "name": "파랑새야담",
+          "channel_id": "UCI2uCKOkQvxEC7kzNiB68sQ"
+        },
+        {
+          "name": "조선야담꾼",
+          "channel_id": "UCAKHG2pWK7LmmH5PwWtbiFg"
+        },
+        {
+          "name": "밤마실야담",
+          "channel_id": "UCNyQVIoDjRK6bSZLDLyzPlg"
+        },
+        {
+          "name": "호롱불 야담",
+          "channel_id": "UC8UNzv39C_ryQW1R6tkKuaw"
+        },
+        {
+          "name": "조선야화",
+          "channel_id": "UCncXw1PgRaE2i9rzegd5bIg"
+        },
+        {
+          "name": "꽃님야담",
+          "channel_id": "UCn7k7bX6iAUg-u3wCFkMXkg"
+        },
+        {
+          "name": "슬기로운야담",
+          "channel_id": "UCMKa_Q1RokJjexG0iTZwhAQ"
+        },
+        {
+          "name": "황제야담",
+          "channel_id": "UCoHh7T1gs4WDMZy0ochahQw"
+        },
+        {
+          "name": "야담우체국",
+          "channel_id": "UC_Wc28WiZM5G4yRdFR8PU6g"
+        },
+        {
+          "name": "잠든옛야담",
+          "channel_id": "UCd_YkySRFtXxpRXqcpfd3YA"
+        },
+        {
+          "name": "푸른달야담",
+          "channel_id": "UCks7GnJXC-K9bGCRdiZ8-IQ"
+        },
+        {
+          "name": "붉은실야담",
+          "channel_id": "UCyPnZwl5_CgXnBJyGon7_ug"
+        },
+        {
+          "name": "몽이야담",
+          "channel_id": "UCw2fBrirkzeuup7YiwREaXQ"
+        },
+        {
+          "name": "야담동화",
+          "channel_id": "UCO68rMW0pU_3dCNivpLStWw"
+        },
+        {
+          "name": "풍림야담",
+          "channel_id": "UCTPgkOX6NTxxYDTN2l-5uUQ"
+        },
+        {
+          "name": "흔적야담",
+          "channel_id": "UCnhwkclmMvtHrgXBrG__zvg"
+        },
+        {
+          "name": "다복야담",
+          "channel_id": "UCii14pDSmSsEFh2rDd2jLzA"
+        },
+        {
+          "name": "민간야담",
+          "channel_id": "UCfl0sTeMFbYPaC7q8pYBvSA"
+        },
+        {
+          "name": "별아씨야담",
+          "channel_id": "UCHpu-1USot0uAUOGY3j3sJw"
+        },
+        {
+          "name": "건하야담",
+          "channel_id": "UCkESUt1enMzteK7-lI0xVPw"
+        },
+        {
+          "name": "야담도서관",
+          "channel_id": "UCWgYVelq_XSG0n7LD4-Y83A"
+        },
+        {
+          "name": "고갯길야담",
+          "channel_id": "UCL8h439wOom4IdeWd6RAtFg"
+        },
+        {
+          "name": "속닥야담",
+          "channel_id": "UCS_7ap3IJBmcvrRzHYNAeBw"
+        },
+        {
+          "name": "조선라디오",
+          "channel_id": "UCKYth9jR1ocwDHUUoi8mXVg"
+        },
+        {
+          "name": "야담방송국",
+          "channel_id": "UC5E_yVeaF9GFdmMNm38AE9Q"
+        },
+        {
+          "name": "야담을 빚다",
+          "channel_id": "UC7ZQ31YmPBPvFC0YIyTtk8Q"
+        },
+        {
+          "name": "벼리야담",
+          "channel_id": "UC1iPIW3_4rAGOwaG9hbB30g"
+        },
+        {
+          "name": "야담설",
+          "channel_id": "UCjU8qOg9OClOfTfGA31-Uew"
+        },
+        {
+          "name": "설주야담",
+          "channel_id": "UC_G0eFi1nXOrileJPtB1ywg"
+        },
+        {
+          "name": "돌쇠야담-옛날이야기",
+          "channel_id": "UCFqU8jKx6XJTrNWV9UF6sNg"
+        },
+        {
+          "name": "야담주유소",
+          "channel_id": "UCpsotbs-x63amVEYzhUWhdQ"
+        },
+        {
+          "name": "여우골 야담",
+          "channel_id": "UCDvr5iN9dDLRyLu3-owr6nQ"
+        },
+        {
+          "name": "야담극장",
+          "channel_id": "UCL685n6wTd4n4o7bpTtN6bg"
+        },
+        {
+          "name": "금향야담",
+          "channel_id": "UChz2wQcP80rNfo-3xHxgbZg"
+        },
+        {
+          "name": "비채야담",
+          "channel_id": "UCBc5mODVVWJtll269LvGO8Q"
+        },
+        {
+          "name": "아름야담tv",
+          "channel_id": "UCNgLKg9nJc4Y_vjP-VsEDaQ"
+        },
+        {
+          "name": "야담한자락",
+          "channel_id": "UCw0BHaihR4uxe6i35vLMcHQ"
+        },
+        {
+          "name": "월하야담",
+          "channel_id": "UCFTBaXgJvUYlCfWiCEHIiQQ"
+        }
+      ],
+      "auto_collect": false
+    }
+  ]
+}

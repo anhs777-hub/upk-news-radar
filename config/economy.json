@@ -1,0 +1,207 @@
+{
+  "channel": {
+    "id": "economy",
+    "name": "경제 채널",
+    "subtitle": "거시경제 양산형 영상감 발굴"
+  },
+  "fronts": [
+    {
+      "id": "geopolitics_war",
+      "name": "지정학·전쟁",
+      "color": "#f87171",
+      "keywords_ko": [
+        "이란", "호르무즈", "이스라엘", "하마스", "후티", "홍해",
+        "러시아", "우크라이나", "북한", "대만", "중국", "남중국해",
+        "전쟁", "공습", "봉쇄", "제재", "트럼프", "관세"
+      ],
+      "keywords_en": [
+        "Iran", "Hormuz", "Israel", "Houthi", "Red Sea",
+        "Russia", "Ukraine", "Taiwan", "North Korea",
+        "war", "strike", "blockade", "sanction", "Trump", "tariff"
+      ],
+      "daily_axes": ["기름값", "장바구니", "월급"]
+    },
+    {
+      "id": "energy_commodity",
+      "name": "원자재·에너지",
+      "color": "#fb923c",
+      "keywords_ko": [
+        "유가", "원유", "WTI", "브렌트", "OPEC", "감산",
+        "천연가스", "LNG", "금값", "구리", "리튬", "니켈", "원자재"
+      ],
+      "keywords_en": [
+        "oil price", "crude", "WTI", "Brent", "OPEC",
+        "natural gas", "LNG", "gold", "copper", "lithium", "commodity"
+      ],
+      "daily_axes": ["주유소", "전기요금", "난방비"]
+    },
+    {
+      "id": "fx_dollar",
+      "name": "환율·달러",
+      "color": "#5eead4",
+      "keywords_ko": [
+        "원달러", "환율", "달러", "엔화", "위안화", "DXY",
+        "외환보유고", "원화 약세", "킹달러", "환율 방어"
+      ],
+      "keywords_en": [
+        "dollar", "DXY", "yen", "yuan", "won", "FX reserves",
+        "currency", "exchange rate"
+      ],
+      "daily_axes": ["해외직구", "여행", "유학비"]
+    },
+    {
+      "id": "rates_fed",
+      "name": "금리·중앙은행",
+      "color": "#a78bfa",
+      "keywords_ko": [
+        "연준", "FOMC", "파월", "금리인하", "금리인상", "기준금리",
+        "한국은행", "이창용", "국채금리", "장단기금리", "채권"
+      ],
+      "keywords_en": [
+        "Fed", "FOMC", "Powell", "rate cut", "rate hike",
+        "BoK", "Treasury yield", "bond"
+      ],
+      "daily_axes": ["대출이자", "예금", "전세대출"]
+    },
+    {
+      "id": "stocks_flows",
+      "name": "증시·자금흐름",
+      "color": "#60a5fa",
+      "keywords_ko": [
+        "코스피", "코스닥", "나스닥", "S&P", "다우", "니케이",
+        "외국인", "기관", "공매도", "ETF", "삼성전자", "TSMC", "엔비디아"
+      ],
+      "keywords_en": [
+        "Kospi", "Nasdaq", "S&P", "Dow", "Nikkei",
+        "foreign investor", "short selling", "ETF"
+      ],
+      "daily_axes": ["주식", "퇴직연금", "ISA"]
+    },
+    {
+      "id": "realestate_debt",
+      "name": "부동산·가계부채",
+      "color": "#fbbf24",
+      "keywords_ko": [
+        "부동산", "아파트", "집값", "전세", "월세", "분양",
+        "PF", "프로젝트파이낸싱", "가계부채", "DSR", "대출규제", "재건축"
+      ],
+      "keywords_en": [
+        "real estate", "housing", "mortgage", "household debt", "DSR"
+      ],
+      "daily_axes": ["전세", "월세", "내집마련"]
+    },
+    {
+      "id": "k_industry",
+      "name": "K-산업",
+      "color": "#34d399",
+      "keywords_ko": [
+        "반도체", "HBM", "삼성전자", "SK하이닉스", "방산", "K방산",
+        "한화에어로", "KAI", "조선", "HD현대", "한화오션",
+        "2차전지", "배터리", "LG에너지솔루션", "포스코", "현대차", "기아"
+      ],
+      "keywords_en": [
+        "semiconductor", "HBM", "Samsung", "SK Hynix", "K-defense",
+        "shipbuilding", "battery", "LG Energy", "Hyundai"
+      ],
+      "daily_axes": ["일자리", "월급", "보너스"]
+    },
+    {
+      "id": "trade_supply",
+      "name": "무역·공급망",
+      "color": "#c084fc",
+      "keywords_ko": [
+        "수출", "수입", "무역수지", "관세", "트럼프 관세", "보호무역",
+        "공급망", "중국 디리스킹", "리쇼어링", "FTA", "IRA", "CHIPS법"
+      ],
+      "keywords_en": [
+        "export", "import", "trade balance", "tariff", "supply chain",
+        "decoupling", "reshoring", "IRA", "CHIPS Act"
+      ],
+      "daily_axes": ["수입품 가격", "직구", "관세"]
+    },
+    {
+      "id": "inflation_consumer",
+      "name": "인플레·소비",
+      "color": "#2dd4bf",
+      "keywords_ko": [
+        "물가", "CPI", "인플레", "근원물가", "장바구니",
+        "외식물가", "농산물", "사과", "배추", "유통", "쿠팡", "이마트", "소비"
+      ],
+      "keywords_en": [
+        "CPI", "inflation", "core inflation", "consumer price", "retail"
+      ],
+      "daily_axes": ["장바구니", "외식", "배달"]
+    },
+    {
+      "id": "bigtech",
+      "name": "빅테크·플랫폼",
+      "color": "#f59e0b",
+      "keywords_ko": [
+        "삼성전자", "애플", "구글", "마이크로소프트", "메타", "아마존",
+        "네이버", "카카오", "실적", "매출", "인수", "투자",
+        "조직개편", "CEO", "빅테크", "플랫폼", "클라우드", "데이터센터",
+        "반독점", "과징금", "독과점"
+      ],
+      "keywords_en": [
+        "Samsung Electronics", "Apple", "Google", "Microsoft", "Meta", "Amazon",
+        "earnings", "revenue", "acquisition", "layoff", "restructuring",
+        "big tech", "platform", "cloud", "data center", "antitrust", "monopoly"
+      ],
+      "daily_axes": ["스마트폰", "구독료", "앱스토어"]
+    }
+  ],
+  "scoring": {
+    "axes": [
+      {"id": "impact", "name": "충격도", "weight": 1.0, "guide": "숫자가 직관적으로 큰가 (조원, 배수, 배율)"},
+      {"id": "daily", "name": "일상 연결", "weight": 1.3, "guide": "시청자 지갑(기름값/대출이자/장바구니/월급)에 닿는가"},
+      {"id": "novelty", "name": "새로움", "weight": 1.0, "guide": "최초 발표/돌파구/반전 요소"},
+      {"id": "search", "name": "검색 잠재력", "weight": 0.9, "guide": "사람들이 찾을 키워드인가"},
+      {"id": "visual", "name": "시각화", "weight": 0.7, "guide": "차트/숫자 비교로 만들기 쉬운가"}
+    ],
+    "threshold_candidate": 16,
+    "threshold_watch": 14,
+    "candidate_quota_per_front": 2
+  },
+  "ctr_scoring": {
+    "axes": [
+      {"id": "hook_strength", "name": "후크 강도", "weight": 1.5, "guide": "첫 3초 멱살잡기. 사건/숫자/도발/장면 중 하나가 즉시 등장"},
+      {"id": "daily_entry", "name": "일상 진입도", "weight": 1.5, "guide": "내 지갑/내 대출/내 월급 같은 시청자 사물이 30초 안에"},
+      {"id": "number_shock", "name": "숫자 충격", "weight": 1.2, "guide": "조 단위/배율/퍼센트 직관적 격차"},
+      {"id": "provocation", "name": "도발/궁금증 갭", "weight": 1.3, "guide": "안 보면 못 견디는 갭. 폭락/직격탄/패닉/사실은"},
+      {"id": "search_volume", "name": "키워드 검색량", "weight": 1.0, "guide": "사람들이 실제로 검색하는 단어인가"},
+      {"id": "familiarity", "name": "친숙도 균형", "weight": 0.8, "guide": "들어봤지만 모르는 것"},
+      {"id": "thumbnail_match", "name": "썸네일 매칭", "weight": 0.8, "guide": "제목과 썸네일 텍스트가 같은 메시지"},
+      {"id": "jargon_penalty", "name": "학술용어 페널티", "weight": -1.0, "guide": "디커플링/스태그플레이션/양적긴축 같은 어려운 한자·영어. 1=깨끗 5=심각"}
+    ],
+    "max_raw": 33.4,
+    "thresholds": {"strong": 80, "ok": 65}
+  },
+  "sources": [
+    {"name": "구글 뉴스 - 경제", "url": "https://news.google.com/rss/search?q=%EA%B2%BD%EC%A0%9C&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 환율", "url": "https://news.google.com/rss/search?q=%ED%99%98%EC%9C%A8&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 유가", "url": "https://news.google.com/rss/search?q=%EC%9C%A0%EA%B0%80&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 금리", "url": "https://news.google.com/rss/search?q=%EA%B8%88%EB%A6%AC&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 부동산", "url": "https://news.google.com/rss/search?q=%EB%B6%80%EB%8F%99%EC%82%B0&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 코스피", "url": "https://news.google.com/rss/search?q=%EC%BD%94%EC%8A%A4%ED%94%BC&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 이란 호르무즈", "url": "https://news.google.com/rss/search?q=%EC%9D%B4%EB%9E%80+%ED%98%B8%EB%A5%B4%EB%AC%B4%EC%A6%88&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 트럼프 관세", "url": "https://news.google.com/rss/search?q=%ED%8A%B8%EB%9F%BC%ED%94%84+%EA%B4%80%EC%84%B8&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "한경 - 마켓", "url": "https://www.hankyung.com/feed/finance", "lang": "ko"},
+    {"name": "매경 - 경제", "url": "https://www.mk.co.kr/rss/30000001/", "lang": "ko"},
+    {"name": "연합뉴스 - 경제", "url": "https://www.yna.co.kr/rss/economy.xml", "lang": "ko"},
+    {"name": "Reuters Markets", "url": "https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best", "lang": "en"},
+    {"name": "Bloomberg Markets", "url": "https://feeds.bloomberg.com/markets/news.rss", "lang": "en"},
+    {"name": "FT World", "url": "https://www.ft.com/world?format=rss", "lang": "en"},
+    {"name": "구글 뉴스 - 빅테크 기업", "url": "https://news.google.com/rss/search?q=%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90+OR+%EC%95%A0%ED%94%8C+OR+%EA%B5%AC%EA%B8%80+OR+%EB%A7%88%EC%9D%B4%ED%81%AC%EB%A1%9C%EC%86%8C%ED%94%84%ED%8A%B8+OR+%EB%A9%94%ED%83%80&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "한경 IT/과학", "url": "https://www.hankyung.com/feed/it", "lang": "ko"},
+    {"name": "Bloomberg Technology", "url": "https://feeds.bloomberg.com/technology/news.rss", "lang": "en"}
+  ],
+  "models": {
+    "classifier": "claude-haiku-4-5-20251001",
+    "copywriter": "claude-sonnet-4-6"
+  },
+  "filter": {
+    "max_age_hours": 72,
+    "min_title_chars": 10,
+    "max_items": 100
+  }
+}

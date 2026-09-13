@@ -1,0 +1,533 @@
+{
+  "fronts": [
+    {
+      "id": "semiconductor",
+      "name": "반도체·AI 칩",
+      "color": "#5eead4",
+      "keywords_ko": [
+        "삼성전자",
+        "SK하이닉스",
+        "TSMC",
+        "파운드리",
+        "HBM",
+        "엔비디아",
+        "AMD",
+        "팹",
+        "공정",
+        "웨이퍼",
+        "노광",
+        "ASML",
+        "D램",
+        "낸드"
+      ],
+      "keywords_en": [
+        "TSMC",
+        "Samsung Foundry",
+        "Nvidia",
+        "AMD",
+        "HBM",
+        "wafer",
+        "fab",
+        "ASML",
+        "lithography",
+        "DRAM",
+        "NAND",
+        "chip"
+      ],
+      "daily_axes": [
+        "폰",
+        "전기차",
+        "전기요금"
+      ]
+    },
+    {
+      "id": "ai_model",
+      "name": "AI 모델·서비스",
+      "color": "#a78bfa",
+      "keywords_ko": [
+        "오픈AI",
+        "GPT",
+        "클로드",
+        "제미나이",
+        "LLM",
+        "생성형",
+        "에이전트",
+        "라마",
+        "딥시크",
+        "추론모델"
+      ],
+      "keywords_en": [
+        "OpenAI",
+        "GPT",
+        "Claude",
+        "Gemini",
+        "LLM",
+        "generative AI",
+        "agent",
+        "Llama",
+        "DeepSeek",
+        "reasoning model",
+        "Anthropic"
+      ],
+      "daily_axes": [
+        "일자리",
+        "검색",
+        "공부"
+      ]
+    },
+    {
+      "id": "ev_autonomous",
+      "name": "전기차·자율주행",
+      "color": "#fbbf24",
+      "keywords_ko": [
+        "테슬라",
+        "전기차",
+        "배터리",
+        "현대차",
+        "기아",
+        "자율주행",
+        "FSD",
+        "BYD",
+        "충전기",
+        "LFP"
+      ],
+      "keywords_en": [
+        "Tesla",
+        "EV",
+        "battery",
+        "Hyundai",
+        "Kia",
+        "autonomous",
+        "FSD",
+        "BYD",
+        "charger",
+        "LFP",
+        "solid-state"
+      ],
+      "daily_axes": [
+        "출퇴근",
+        "기름값",
+        "주차"
+      ]
+    },
+    {
+      "id": "space_satellite",
+      "name": "우주·위성",
+      "color": "#60a5fa",
+      "keywords_ko": [
+        "스페이스X",
+        "스타링크",
+        "누리호",
+        "위성",
+        "발사",
+        "달 탐사",
+        "화성",
+        "국제우주정거장",
+        "한화에어로"
+      ],
+      "keywords_en": [
+        "SpaceX",
+        "Starlink",
+        "satellite",
+        "launch",
+        "moon",
+        "Mars",
+        "ISS",
+        "rocket",
+        "Blue Origin"
+      ],
+      "daily_axes": [
+        "인터넷",
+        "GPS",
+        "재난"
+      ]
+    },
+    {
+      "id": "bio",
+      "name": "바이오·헬스",
+      "color": "#f472b6",
+      "keywords_ko": [
+        "mRNA",
+        "신약",
+        "FDA",
+        "임상",
+        "유전자",
+        "크리스퍼",
+        "셀트리온",
+        "삼바",
+        "비만치료제",
+        "GLP-1"
+      ],
+      "keywords_en": [
+        "mRNA",
+        "drug",
+        "FDA",
+        "clinical trial",
+        "gene",
+        "CRISPR",
+        "GLP-1",
+        "Ozempic",
+        "biotech"
+      ],
+      "daily_axes": [
+        "건강검진",
+        "약값",
+        "다이어트"
+      ]
+    },
+    {
+      "id": "energy",
+      "name": "에너지",
+      "color": "#fb923c",
+      "keywords_ko": [
+        "태양광",
+        "풍력",
+        "원전",
+        "SMR",
+        "수소",
+        "전력망",
+        "전기요금",
+        "한전",
+        "ESS",
+        "재생에너지"
+      ],
+      "keywords_en": [
+        "solar",
+        "wind",
+        "nuclear",
+        "SMR",
+        "hydrogen",
+        "grid",
+        "renewable",
+        "ESS",
+        "battery storage"
+      ],
+      "daily_axes": [
+        "전기요금",
+        "주유소",
+        "냉난방"
+      ]
+    },
+    {
+      "id": "robotics",
+      "name": "로봇·자동화",
+      "color": "#34d399",
+      "keywords_ko": [
+        "로봇",
+        "휴머노이드",
+        "보스턴다이내믹스",
+        "테슬라 옵티머스",
+        "협동로봇",
+        "물류로봇"
+      ],
+      "keywords_en": [
+        "robot",
+        "humanoid",
+        "Boston Dynamics",
+        "Optimus",
+        "cobot",
+        "warehouse robot",
+        "Figure"
+      ],
+      "daily_axes": [
+        "일자리",
+        "배달",
+        "집안일"
+      ]
+    },
+    {
+      "id": "quantum_telecom",
+      "name": "양자·통신",
+      "color": "#c084fc",
+      "keywords_ko": [
+        "양자컴퓨터",
+        "큐비트",
+        "양자암호",
+        "6G",
+        "5G",
+        "광통신",
+        "위성통신"
+      ],
+      "keywords_en": [
+        "quantum computer",
+        "qubit",
+        "quantum cryptography",
+        "6G",
+        "5G",
+        "photonic",
+        "QKD"
+      ],
+      "daily_axes": [
+        "보안",
+        "인터넷",
+        "비밀번호"
+      ]
+    },
+    {
+      "id": "climate_materials",
+      "name": "기후·소재",
+      "color": "#2dd4bf",
+      "keywords_ko": [
+        "기후변화",
+        "탄소중립",
+        "이산화탄소",
+        "그래핀",
+        "신소재",
+        "초전도",
+        "탄소포집",
+        "CCUS"
+      ],
+      "keywords_en": [
+        "climate",
+        "carbon capture",
+        "CCUS",
+        "graphene",
+        "superconductor",
+        "novel material",
+        "net zero"
+      ],
+      "daily_axes": [
+        "날씨",
+        "물가",
+        "농산물"
+      ]
+    },
+    {
+      "id": "bigtech",
+      "name": "빅테크·플랫폼",
+      "color": "#f59e0b",
+      "keywords_ko": [
+        "삼성전자",
+        "애플",
+        "구글",
+        "마이크로소프트",
+        "메타",
+        "아마존",
+        "네이버",
+        "카카오",
+        "실적",
+        "매출",
+        "인수",
+        "투자",
+        "조직개편",
+        "CEO",
+        "빅테크",
+        "플랫폼",
+        "클라우드",
+        "데이터센터"
+      ],
+      "keywords_en": [
+        "Samsung Electronics",
+        "Apple",
+        "Google",
+        "Microsoft",
+        "Meta",
+        "Amazon",
+        "earnings",
+        "revenue",
+        "acquisition",
+        "layoff",
+        "restructuring",
+        "big tech",
+        "platform",
+        "cloud",
+        "data center",
+        "antitrust"
+      ],
+      "daily_axes": [
+        "스마트폰",
+        "구독료",
+        "앱스토어"
+      ]
+    }
+  ],
+  "scoring": {
+    "axes": [
+      {
+        "id": "impact",
+        "name": "충격도",
+        "weight": 1.0,
+        "guide": "숫자가 직관적으로 큰가 (조원, 배수, 배율)"
+      },
+      {
+        "id": "daily",
+        "name": "일상 연결",
+        "weight": 1.2,
+        "guide": "시청자 사물(폰/차/지갑/일자리/집)에 닿는가"
+      },
+      {
+        "id": "novelty",
+        "name": "새로움",
+        "weight": 1.0,
+        "guide": "최초 발표/돌파구/반전 요소"
+      },
+      {
+        "id": "search",
+        "name": "검색 잠재력",
+        "weight": 0.8,
+        "guide": "사람들이 찾을 키워드인가"
+      },
+      {
+        "id": "visual",
+        "name": "시각화",
+        "weight": 0.8,
+        "guide": "영상으로 만들기 쉬운가 (비교/실물/도식)"
+      }
+    ],
+    "threshold_candidate": 18,
+    "threshold_watch": 14
+  },
+  "ctr_scoring": {
+    "axes": [
+      {
+        "id": "hook_strength",
+        "name": "후크 강도",
+        "weight": 1.5,
+        "guide": "첫 3초 멱살잡기. 사건/숫자/도발/장면 중 하나가 즉시 등장하는가"
+      },
+      {
+        "id": "daily_entry",
+        "name": "일상 진입도",
+        "weight": 1.5,
+        "guide": "내 폰/내 차/내 카톡 같은 시청자 사물이 30초 안에 등장하는가"
+      },
+      {
+        "id": "number_shock",
+        "name": "숫자 충격",
+        "weight": 1.2,
+        "guide": "100억년→5분, 22조 같은 직관적 격차"
+      },
+      {
+        "id": "provocation",
+        "name": "도발/궁금증 갭",
+        "weight": 1.2,
+        "guide": "안 보면 못 견디는 갭. 왜?/사실은/정반대"
+      },
+      {
+        "id": "search_volume",
+        "name": "키워드 검색량",
+        "weight": 1.0,
+        "guide": "사람들이 실제로 검색하는 단어인가"
+      },
+      {
+        "id": "familiarity",
+        "name": "친숙도 균형",
+        "weight": 0.8,
+        "guide": "들어봤지만 모르는 것. 너무 어렵지도 너무 뻔하지도 X"
+      },
+      {
+        "id": "thumbnail_match",
+        "name": "썸네일 매칭",
+        "weight": 0.8,
+        "guide": "제목과 썸네일 텍스트가 같은 메시지를 주는가"
+      },
+      {
+        "id": "jargon_penalty",
+        "name": "학술용어 페널티",
+        "weight": -1.0,
+        "guide": "결어긋남/양자우월성/패권 같은 한자어/추상어. 1점=깨끗 5점=심각"
+      }
+    ],
+    "max_raw": 33.4,
+    "thresholds": {
+      "strong": 80,
+      "ok": 65
+    }
+  },
+  "sources": [
+    {
+      "name": "구글 뉴스 - 한국 IT",
+      "url": "https://news.google.com/rss/search?q=IT+%EA%B8%B0%EC%88%A0&hl=ko&gl=KR&ceid=KR:ko",
+      "lang": "ko"
+    },
+    {
+      "name": "구글 뉴스 - 한국 반도체",
+      "url": "https://news.google.com/rss/search?q=%EB%B0%98%EB%8F%84%EC%B2%B4&hl=ko&gl=KR&ceid=KR:ko",
+      "lang": "ko"
+    },
+    {
+      "name": "구글 뉴스 - 한국 전기차",
+      "url": "https://news.google.com/rss/search?q=%EC%A0%84%EA%B8%B0%EC%B0%A8&hl=ko&gl=KR&ceid=KR:ko",
+      "lang": "ko"
+    },
+    {
+      "name": "전자신문",
+      "url": "https://rss.etnews.com/Section901.xml",
+      "lang": "ko"
+    },
+    {
+      "name": "ZDNet Korea",
+      "url": "https://feeds.feedburner.com/zdkorea",
+      "lang": "ko"
+    },
+    {
+      "name": "Hacker News Front",
+      "url": "https://hnrss.org/frontpage",
+      "lang": "en"
+    },
+    {
+      "name": "Ars Technica",
+      "url": "https://feeds.arstechnica.com/arstechnica/index",
+      "lang": "en"
+    },
+    {
+      "name": "MIT Technology Review",
+      "url": "https://www.technologyreview.com/feed/",
+      "lang": "en"
+    },
+    {
+      "name": "The Verge",
+      "url": "https://www.theverge.com/rss/index.xml",
+      "lang": "en"
+    },
+    {
+      "name": "IEEE Spectrum",
+      "url": "https://spectrum.ieee.org/feeds/feed.rss",
+      "lang": "en"
+    },
+    {
+      "name": "Reuters Technology",
+      "url": "https://www.reutersagency.com/feed/?best-topics=tech&post_type=best",
+      "lang": "en"
+    },
+    {
+      "name": "Nature News",
+      "url": "https://www.nature.com/nature.rss",
+      "lang": "en"
+    },
+    {
+      "name": "ScienceDaily Top",
+      "url": "https://www.sciencedaily.com/rss/top/science.xml",
+      "lang": "en"
+    },
+    {
+      "name": "TechCrunch",
+      "url": "https://techcrunch.com/feed/",
+      "lang": "en"
+    },
+    {
+      "name": "구글 뉴스 - 빅테크 기업",
+      "url": "https://news.google.com/rss/search?q=%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90+OR+%EC%95%A0%ED%94%8C+OR+%EA%B5%AC%EA%B8%80+OR+%EB%A7%88%EC%9D%B4%ED%81%AC%EB%A1%9C%EC%86%8C%ED%94%84%ED%8A%B8+OR+%EB%A9%94%ED%83%80&hl=ko&gl=KR&ceid=KR:ko",
+      "lang": "ko"
+    },
+    {
+      "name": "한경 IT/과학",
+      "url": "https://www.hankyung.com/feed/it",
+      "lang": "ko"
+    },
+    {
+      "name": "Bloomberg Technology",
+      "url": "https://feeds.bloomberg.com/technology/news.rss",
+      "lang": "en"
+    }
+  ],
+  "models": {
+    "classifier": "claude-haiku-4-5-20251001",
+    "copywriter": "claude-sonnet-4-6"
+  },
+  "filter": {
+    "max_age_hours": 72,
+    "min_title_chars": 10,
+    "max_items": 100
+  }
+}

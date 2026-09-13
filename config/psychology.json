@@ -1,0 +1,210 @@
+{
+  "channel": {
+    "id": "psychology",
+    "name": "심리 채널",
+    "subtitle": "감정·관계 진단형 영상감 발굴"
+  },
+  "fronts": [
+    {
+      "id": "relationship",
+      "name": "관계·소통",
+      "color": "#f472b6",
+      "keywords_ko": [
+        "인간관계", "친구", "절교", "손절", "연애", "이별", "헤어짐",
+        "결혼", "이혼", "가족", "부모", "시댁", "고부", "형제",
+        "직장인간관계", "상사", "갑질", "거절", "카톡", "읽씹", "안읽씹"
+      ],
+      "keywords_en": [
+        "relationship", "friendship", "breakup", "dating",
+        "marriage", "divorce", "family conflict", "ghosting",
+        "workplace relationship", "toxic relationship"
+      ],
+      "daily_axes": ["카톡", "연애", "직장"]
+    },
+    {
+      "id": "self_esteem",
+      "name": "자존감·비교",
+      "color": "#a78bfa",
+      "keywords_ko": [
+        "자존감", "자존심", "자기혐오", "자기비하", "열등감",
+        "비교", "인스타", "SNS 피로", "FOMO", "과시",
+        "완벽주의", "자기계발 강박", "성취 중독", "번아웃"
+      ],
+      "keywords_en": [
+        "self-esteem", "self-worth", "self-loathing", "inferiority",
+        "social comparison", "Instagram", "FOMO", "perfectionism",
+        "burnout", "impostor syndrome"
+      ],
+      "daily_axes": ["인스타", "연봉", "외모"]
+    },
+    {
+      "id": "emotion_mood",
+      "name": "감정·기분",
+      "color": "#60a5fa",
+      "keywords_ko": [
+        "우울", "우울증", "불안", "공황", "공황장애", "분노",
+        "짜증", "무기력", "슬픔", "외로움", "고독",
+        "감정기복", "감정조절", "스트레스", "마음챙김", "명상"
+      ],
+      "keywords_en": [
+        "depression", "anxiety", "panic attack", "anger",
+        "loneliness", "mood swing", "emotional regulation",
+        "stress", "mindfulness", "meditation"
+      ],
+      "daily_axes": ["잠", "출근", "주말"]
+    },
+    {
+      "id": "personality",
+      "name": "성격·MBTI",
+      "color": "#34d399",
+      "keywords_ko": [
+        "MBTI", "성격", "내향", "외향", "INFP", "ENFP", "INTJ",
+        "성격유형", "에니어그램", "빅파이브", "기질",
+        "나르시시스트", "사이코패스", "소시오패스", "HSP", "예민함"
+      ],
+      "keywords_en": [
+        "MBTI", "personality", "introvert", "extrovert",
+        "enneagram", "Big Five", "narcissist", "psychopath",
+        "sociopath", "highly sensitive person", "HSP"
+      ],
+      "daily_axes": ["연애", "직장", "친구"]
+    },
+    {
+      "id": "brain_science",
+      "name": "뇌과학·근거",
+      "color": "#c084fc",
+      "keywords_ko": [
+        "뇌과학", "신경과학", "도파민", "세로토닌", "옥시토신",
+        "코르티솔", "편도체", "전두엽", "거울뉴런",
+        "보상회로", "중독", "습관", "신경가소성", "뇌 발달"
+      ],
+      "keywords_en": [
+        "neuroscience", "dopamine", "serotonin", "oxytocin",
+        "cortisol", "amygdala", "prefrontal cortex", "mirror neuron",
+        "reward circuit", "addiction", "habit", "neuroplasticity"
+      ],
+      "daily_axes": ["스마트폰", "습관", "중독"]
+    },
+    {
+      "id": "trauma_attachment",
+      "name": "트라우마·애착",
+      "color": "#fb923c",
+      "keywords_ko": [
+        "트라우마", "PTSD", "애착", "회피형", "불안형", "안정형",
+        "애착 유형", "유년기", "상처", "방어기제", "가스라이팅",
+        "이별 후유증", "감정 쓰레기통", "원가족"
+      ],
+      "keywords_en": [
+        "trauma", "PTSD", "attachment", "avoidant", "anxious attachment",
+        "inner child", "defense mechanism", "gaslighting",
+        "emotional abuse", "childhood wound"
+      ],
+      "daily_axes": ["연애", "가족", "직장"]
+    },
+    {
+      "id": "sleep_habit",
+      "name": "수면·습관",
+      "color": "#fbbf24",
+      "keywords_ko": [
+        "수면", "불면증", "수면의 질", "아침형", "저녁형",
+        "루틴", "미라클모닝", "아침 습관", "루틴 형성",
+        "집중력", "주의력", "산만함", "도파민 디톡스", "스마트폰 중독"
+      ],
+      "keywords_en": [
+        "sleep", "insomnia", "sleep quality", "morning routine",
+        "habit formation", "focus", "attention", "digital detox",
+        "smartphone addiction", "procrastination"
+      ],
+      "daily_axes": ["잠", "스마트폰", "공부"]
+    },
+    {
+      "id": "work_motivation",
+      "name": "일·동기",
+      "color": "#5eead4",
+      "keywords_ko": [
+        "번아웃", "무기력", "퇴사", "이직", "직장 스트레스",
+        "동기부여", "의욕", "게으름", "미루기", "작심삼일",
+        "성취감", "워라밸", "조용한 사직", "퇴직", "N잡"
+      ],
+      "keywords_en": [
+        "burnout", "career", "quiet quitting", "motivation",
+        "procrastination", "work-life balance", "productivity",
+        "job satisfaction", "resignation"
+      ],
+      "daily_axes": ["출근", "월급", "퇴근"]
+    },
+    {
+      "id": "social_trend",
+      "name": "사회·세대",
+      "color": "#f87171",
+      "keywords_ko": [
+        "MZ세대", "Z세대", "밀레니얼", "알파세대", "세대갈등",
+        "1인 가구", "비혼", "딩크", "혼밥", "혼술",
+        "고립", "은둔", "히키코모리", "외로움 위기", "관계 피로"
+      ],
+      "keywords_en": [
+        "Gen Z", "millennial", "generational gap", "single household",
+        "loneliness epidemic", "social isolation", "hikikomori",
+        "dating fatigue", "anti-social"
+      ],
+      "daily_axes": ["연애", "결혼", "혼자"]
+    }
+  ],
+  "scoring": {
+    "axes": [
+      {"id": "impact", "name": "공감 강도", "weight": 1.2, "guide": "많은 사람이 자기 얘기라고 느끼는가"},
+      {"id": "daily", "name": "일상 연결", "weight": 1.3, "guide": "내 카톡/내 연애/내 직장 같은 시청자 사물에 닿는가"},
+      {"id": "novelty", "name": "새로움", "weight": 0.9, "guide": "새로운 연구/개념/반전 해석"},
+      {"id": "search", "name": "검색 잠재력", "weight": 1.0, "guide": "사람들이 실제 검색할 감정·관계 키워드인가"},
+      {"id": "visual", "name": "시각화", "weight": 0.7, "guide": "카톡·인스타 메타포로 그리기 쉬운가"}
+    ],
+    "threshold_candidate": 16,
+    "threshold_watch": 13,
+    "candidate_quota_per_front": 2
+  },
+  "ctr_scoring": {
+    "axes": [
+      {"id": "hook_strength", "name": "후크 강도", "weight": 1.5, "guide": "첫 3초 멱살잡기. 감정/장면/도발 즉시 등장"},
+      {"id": "daily_entry", "name": "일상 진입도", "weight": 1.5, "guide": "내 카톡/내 연애/내 직장이 30초 안에 등장하는가"},
+      {"id": "number_shock", "name": "숫자 충격", "weight": 1.0, "guide": "통계·연구 숫자가 직관적 격차를 만드는가"},
+      {"id": "provocation", "name": "도발/궁금증 갭", "weight": 1.4, "guide": "사실은/정반대/의외로. 안 보면 못 견디는 갭"},
+      {"id": "search_volume", "name": "키워드 검색량", "weight": 1.0, "guide": "사람들이 실제로 검색하는 감정·관계 단어"},
+      {"id": "familiarity", "name": "친숙도 균형", "weight": 0.9, "guide": "들어봤지만 모르는 것"},
+      {"id": "thumbnail_match", "name": "썸네일 매칭", "weight": 0.8, "guide": "제목과 카피바라 썸네일이 같은 메시지"},
+      {"id": "jargon_penalty", "name": "학술용어 페널티", "weight": -1.0, "guide": "정서조절장애/인지왜곡/투사동일시 같은 임상 한자어. 1=깨끗 5=심각"}
+    ],
+    "max_raw": 33.4,
+    "thresholds": {"strong": 80, "ok": 65}
+  },
+  "sources": [
+    {"name": "구글 뉴스 - 심리", "url": "https://news.google.com/rss/search?q=%EC%8B%AC%EB%A6%AC&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 우울증 불안", "url": "https://news.google.com/rss/search?q=%EC%9A%B0%EC%9A%B8%EC%A6%9D+OR+%EB%B6%88%EC%95%88%EC%9E%A5%EC%95%A0&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 자존감 번아웃", "url": "https://news.google.com/rss/search?q=%EC%9E%90%EC%A1%B4%EA%B0%90+OR+%EB%B2%88%EC%95%84%EC%9B%83&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 인간관계", "url": "https://news.google.com/rss/search?q=%EC%9D%B8%EA%B0%84%EA%B4%80%EA%B3%84+OR+%EA%B0%80%EC%8A%A4%EB%9D%BC%EC%9D%B4%ED%8C%85&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 뇌과학 도파민", "url": "https://news.google.com/rss/search?q=%EB%87%8C%EA%B3%BC%ED%95%99+OR+%EB%8F%84%ED%8C%8C%EB%AF%BC&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - MBTI 성격", "url": "https://news.google.com/rss/search?q=MBTI+OR+%EC%84%B1%EA%B2%A9%EC%9C%A0%ED%98%95&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - 수면 불면", "url": "https://news.google.com/rss/search?q=%EC%88%98%EB%A9%B4+OR+%EB%B6%88%EB%A9%B4%EC%A6%9D&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "구글 뉴스 - MZ 1인가구 외로움", "url": "https://news.google.com/rss/search?q=MZ%EC%84%B8%EB%8C%80+OR+1%EC%9D%B8%EA%B0%80%EA%B5%AC+OR+%EC%99%B8%EB%A1%9C%EC%9B%80&hl=ko&gl=KR&ceid=KR:ko", "lang": "ko"},
+    {"name": "한경 라이프", "url": "https://www.hankyung.com/feed/life", "lang": "ko"},
+    {"name": "Psychology Today", "url": "https://www.psychologytoday.com/intl/front/feed", "lang": "en"},
+    {"name": "ScienceDaily - Mind & Brain", "url": "https://www.sciencedaily.com/rss/mind_brain.xml", "lang": "en"},
+    {"name": "ScienceDaily - Relationships", "url": "https://www.sciencedaily.com/rss/mind_brain/relationships.xml", "lang": "en"},
+    {"name": "BPS Research Digest", "url": "https://digest.bps.org.uk/feed/", "lang": "en"},
+    {"name": "The Conversation - Psychology", "url": "https://theconversation.com/us/topics/psychology-109/articles.atom", "lang": "en"},
+    {"name": "Greater Good Science Center", "url": "https://greatergood.berkeley.edu/feeds/articles.rss", "lang": "en"},
+    {"name": "Nature Human Behaviour", "url": "https://www.nature.com/nathumbehav.rss", "lang": "en"}
+  ],
+  "models": {
+    "classifier": "claude-haiku-4-5-20251001",
+    "copywriter": "claude-sonnet-4-6"
+  },
+  "filter": {
+    "max_age_hours": 72,
+    "min_title_chars": 10,
+    "max_items": 100
+  },
+  "youtube": {
+    "trending_categories": ["22", "26"],
+    "_comment": "22=People & Blogs, 26=Howto & Style. Education(27)은 KR 리전 mostPopular 미지원(404)"
+  }
+}

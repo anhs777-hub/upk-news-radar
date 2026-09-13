@@ -1,0 +1,3215 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>뉴스 레이더 — 과학 채널 영상감 발굴</title>
+<style>
+  :root {
+    --bg: #0b0f17;
+    --bg-2: #121826;
+    --bg-3: #1a2333;
+    --fg: #e6edf7;
+    --fg-dim: #8b97ad;
+    --accent: #5eead4;
+    --accent-2: #a78bfa;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --border: #232c40;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font-family: -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; font-size: 14px; }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: stretch; gap: 10px; background: var(--bg-2); position: sticky; top: 0; z-index: 10; }
+  /* 헤더 그룹 카드 — 종류별 영역 분리 */
+  .hgroup { background: var(--bg-3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; display: flex; align-items: center; gap: 10px; }
+  .hgroup.title { background: transparent; border: none; padding: 0 4px 0 0; }
+  .hgroup .col { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
+  .hgroup .col .l1 { font-size: 13px; color: var(--fg); font-weight: 600; }
+  .hgroup .col .l2 { font-size: 10px; color: var(--fg-dim); }
+  .hgroup .col .lbl { font-size: 9px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  .hgroup .col .val { font-size: 12px; color: var(--fg); font-weight: 600; }
+  .hgroup.btns { gap: 6px; padding: 4px 8px; }
+  /* 통일된 헤더 버튼 */
+  .hbtn { position: relative; overflow: hidden; background: var(--bg-2); color: var(--fg); border: 1px solid var(--border); border-radius: 6px; padding: 0; height: 44px; min-width: 70px; cursor: pointer; font-size: 11px; line-height: 1.15; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: border-color 0.15s; }
+  .hbtn:hover { background: var(--accent); color: #00211a; border-color: var(--accent); }
+  .hbtn.primary { background: var(--accent); color: #00211a; border-color: var(--accent); font-weight: 700; }
+  .hbtn.icon { min-width: 44px; font-size: 16px; }
+  .hbtn .ic, .hbtn .tx { position: relative; z-index: 2; }
+  .hbtn .ic { font-size: 14px; }
+  .hbtn .tx { font-size: 10px; }
+  /* 진행률 바 (버튼 내부) */
+  .hbtn .pbar { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: var(--accent); z-index: 1; transition: width 0.4s ease-out; pointer-events: none; }
+  .hbtn.running { background: var(--bg-3); color: var(--fg); border-color: var(--accent); }
+  .hbtn.running .pbar { background: linear-gradient(90deg, var(--accent), #5eead4cc); }
+  .hbtn.running.primary { background: var(--bg-3); color: var(--fg); }
+  .hbtn.running .ic, .hbtn.running .tx { color: var(--fg); mix-blend-mode: difference; }
+  .hbtn .pct { position: absolute; bottom: 2px; right: 4px; font-size: 8px; color: var(--accent); font-weight: 700; z-index: 3; opacity: 0; }
+  .hbtn.running .pct { opacity: 1; color: var(--fg); }
+  header h1 { font-size: 15px; margin: 0; font-weight: 700; line-height: 1.15; }
+  header .sub { color: var(--fg-dim); font-size: 10px; line-height: 1.15; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; gap: 0; height: calc(100vh - 168px); }
+  /* 떡상 탭: 좌측 사이드바 없는 단일 칼럼 전체 폭 */
+  .layout.breakout-mode { grid-template-columns: 1fr; }
+  /* view-breakout은 인라인 display:flex로 켜짐. 방향·높이만 여기서 지정 */
+  #view-breakout { flex-direction: row; gap: 0; overflow: hidden; height: 100%; min-height: 0; }
+  #view-breakout .cards-area { flex: 1 1 auto; min-width: 0; max-width: none; padding: 16px 24px; overflow-y: auto; display: block; }
+  /* 좌측 분류 사이드바 */
+  .bo-cats { flex: 0 0 200px; display: flex; flex-direction: column; border-right: 1px solid var(--border); padding: 12px 10px; overflow-y: auto; }
+  .bo-cats-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .bo-cats-title { font-size: 13px; font-weight: 700; }
+  .bo-cats-btn { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg-dim); padding: 3px 8px; border-radius: 5px; cursor: pointer; font-size: 11px; }
+  .bo-cats-btn:hover { color: var(--fg); }
+  .bo-cat-list { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .bo-cat-row { display: flex; align-items: center; gap: 4px; padding: 8px 10px; border-radius: 7px; cursor: pointer; border: 1px solid transparent; }
+  .bo-cat-row:hover { background: var(--bg-3); }
+  .bo-cat-row.active { background: var(--bg-3); border-color: var(--accent); }
+  .bo-cat-name { flex: 1; font-size: 13px; font-weight: 600; }
+  .bo-cat-cnt { font-size: 10px; color: var(--fg-dim); }
+  /* 자동수집 OFF — 운영 안 하는 분류. 이름을 흐리고 ⏸를 달아 목록에서 바로 구분된다. */
+  .bo-cat-row.paused .bo-cat-name { color: var(--fg-dim); font-weight: 500; }
+  .bo-cat-row.paused .bo-cat-cnt { opacity: .5; }
+  .bo-cat-auto { font-size: 10px; line-height: 1; opacity: .75; }
+  .bo-cat-gear { background: none; border: none; color: var(--fg-dim); cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 4px; }
+  .bo-cat-gear:hover { color: var(--accent); background: var(--bg-2); }
+  /* 사이드바 하단 자동 감지 (전체 분류 적용) */
+  .bo-cats .bo-sched { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  .bo-cats .bo-sched .bo-mng { text-align: center; }
+  main { padding: 20px; overflow-y: auto; }
+  /* 필터 바 — 그룹 카드 구조 */
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; padding: 8px 16px; border-bottom: 1px solid var(--border); background: var(--bg-2); position: sticky; top: 0; z-index: 9; }
+  .fgroup { background: var(--bg-3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; display: flex; align-items: center; gap: 8px; }
+  .fgroup .col { display: flex; flex-direction: column; gap: 3px; }
+  .fgroup .col .lbl { font-size: 9px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.06em; line-height: 1; }
+  .fgroup select { min-width: 110px; padding: 3px 6px; font-size: 11px; height: 22px; background: var(--bg-2); color: var(--fg); border: 1px solid var(--border); border-radius: 4px; }
+  .fgroup .threshold-mini { display: grid; grid-template-columns: 42px 90px 22px; align-items: center; gap: 6px; font-size: 10px; color: var(--fg-dim); }
+  .fgroup .threshold-mini input[type=range] { width: 90px; height: 16px; }
+  .fgroup .threshold-val { color: var(--accent); font-weight: 700; text-align: center; }
+  .fgroup .threshold-mini .opp-dot-val { justify-self: center; }
+  .win-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+  .opp-dot-val { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 0 6px currentColor; }
+  .fgroup.chips { flex: 0 0 auto; min-width: 380px; padding: 6px 10px; align-items: center; }
+  .fgroup.chips .front-chips-inline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 6px; width: 100%; }
+  .fgroup.chips .chip { padding: 3px 8px; font-size: 11px; justify-content: flex-start; height: 22px; line-height: 1; }
+  /* 통계 박스 (필터바 D그룹) */
+  .fgroup.stats { gap: 10px; padding: 6px 10px; align-items: center; }
+  .fgroup.stats .stat-pair { display: grid; grid-template-columns: auto auto; column-gap: 12px; row-gap: 4px; font-size: 9px; color: var(--fg-dim); align-items: center; white-space: nowrap; }
+  .fgroup.stats .stat-pair b { color: var(--accent); font-size: 11px; font-weight: 700; }
+  .fgroup.stats .yt-stat-grid { display: grid; grid-template-rows: auto auto auto; grid-auto-flow: column; column-gap: 12px; row-gap: 4px; font-size: 9px; color: var(--fg-dim); align-items: center; white-space: nowrap; }
+  .fgroup.stats .yt-stat-grid b { color: var(--accent); font-size: 11px; font-weight: 700; }
+  .toc { background: var(--bg-2); border-right: 1px solid var(--border); overflow-y: auto; padding: 12px 8px; }
+  .toc-header { font-size: 11px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; margin-bottom: 4px; }
+  .toc-item { display: flex; gap: 8px; padding: 8px 10px; border-radius: 6px; cursor: pointer; border-left: 3px solid transparent; transition: background 0.1s; align-items: flex-start; }
+  .toc-item:hover { background: var(--bg-3); }
+  .toc-item.active { background: var(--bg-3); border-left-color: var(--accent); }
+  .toc-item .ctr-mini { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 3px; min-width: 26px; text-align: center; line-height: 1.3; }
+  .toc-item .ctr-mini.strong { background: #eaff00; color: #1a1a00; }
+  .toc-item .ctr-mini.ok { background: #3b82f6; color: #fff; }
+  .toc-item .ctr-mini.weak { background: var(--bg-3); color: var(--fg-dim); border: 1px solid var(--border); }
+  .toc-item .front-bar { width: 3px; align-self: stretch; border-radius: 2px; flex-shrink: 0; min-height: 24px; }
+  .toc-item .toc-text { font-size: 11px; line-height: 1.35; color: var(--fg); flex: 1; overflow: hidden; }
+  .toc-item .toc-text small { display: block; color: var(--fg-dim); font-size: 9px; margin-top: 2px; }
+  .cards-area { overflow-y: auto; padding: 16px 24px; scroll-behavior: smooth; }
+  .cards-area .grid, .cards-area .yt-grid { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 880px; }
+  .card.in-pool, .yt-card.in-pool { background: linear-gradient(180deg, rgba(94,234,212,0.10), rgba(94,234,212,0.02)); border-color: var(--accent); box-shadow: 0 0 0 1px rgba(94,234,212,0.25); }
+  .card.in-pool::before, .yt-card.in-pool::before { content: "⭐ 후보 풀"; position: absolute; top: 8px; right: 8px; font-size: 9px; color: var(--accent); background: rgba(94,234,212,0.12); border: 1px solid var(--accent); padding: 2px 6px; border-radius: 999px; letter-spacing: 0.05em; }
+  .card, .yt-card { position: relative; }
+  button:disabled { opacity: 0.6; cursor: default; background: var(--bg-3); color: var(--accent); border-color: var(--accent); }
+  .card.flash, .yt-card.flash { animation: flashAnim 1.2s ease-out; }
+  @keyframes flashAnim { 0% { box-shadow: 0 0 0 2px var(--accent); } 100% { box-shadow: none; } }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc { display: none; }
+  }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border-radius: 999px; background: var(--bg-3); border: 1px solid var(--border); cursor: pointer; font-size: 12px; user-select: none; }
+  .chip.active { background: var(--accent); color: #00211a; border-color: var(--accent); font-weight: 600; }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+  .card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .badge { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #00211a; }
+  .total { font-size: 22px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .total.watch { color: var(--warn); }
+  .total.low { color: var(--fg-dim); }
+  .summary { font-size: 15px; font-weight: 600; line-height: 1.4; }
+  .title-orig { font-size: 12px; color: var(--fg-dim); line-height: 1.4; }
+  .scores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .score { font-size: 10px; color: var(--fg-dim); text-align: center; }
+  .score .bar { background: var(--bg-3); height: 4px; border-radius: 2px; margin-top: 3px; overflow: hidden; }
+  .score .fill { height: 100%; background: var(--accent); }
+  .hook-box { background: rgba(94, 234, 212, 0.08); border-left: 3px solid var(--accent); padding: 8px 10px; border-radius: 4px; font-size: 13px; line-height: 1.5; }
+  /* RSS 카드 — 영상 기획 패키지 (Hook 위, Angles/Titles 양쪽) */
+  .plan-grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 10px; padding: 6px 0; }
+  .plan-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 6px 0; }
+  @media (max-width: 1100px) {
+    .plan-grid-2 { grid-template-columns: 1fr; }
+  }
+  .plan-card { background: rgba(0,0,0,0.18); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .plan-card.hook { background: linear-gradient(135deg, rgba(94,234,212,0.10), rgba(94,234,212,0.02)); border-color: var(--accent); }
+  .plan-lbl { font-size: 9px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+  .plan-card.hook .plan-lbl { color: var(--accent); }
+  .plan-hook { font-size: 14px; font-weight: 700; color: var(--fg); line-height: 1.4; }
+  .plan-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .plan-list li { font-size: 11px; line-height: 1.4; color: var(--fg); padding: 4px 6px; background: rgba(255,255,255,0.02); border-radius: 3px; border-left: 2px solid transparent; }
+  .plan-card .plan-list li { border-left-color: var(--border); }
+  @media (max-width: 1200px) {
+    .plan-grid { grid-template-columns: 1fr; }
+  }
+  .angles { margin: 0; padding-left: 18px; font-size: 12px; color: var(--fg); line-height: 1.6; }
+  .titles { display: flex; flex-direction: column; gap: 4px; }
+  .title-cand { font-size: 12px; padding: 5px 8px; background: var(--bg-3); border-radius: 4px; }
+  .risk { font-size: 11px; color: var(--warn); padding: 4px 0; }
+  .actions { display: flex; gap: 6px; margin-top: 4px; }
+  button { background: var(--bg-3); color: var(--fg); border: 1px solid var(--border); border-radius: 5px; padding: 6px 10px; font-size: 11px; cursor: pointer; }
+  button:hover { background: var(--accent); color: #00211a; border-color: var(--accent); }
+  button.primary { background: var(--accent); color: #00211a; border-color: var(--accent); font-weight: 600; }
+  .meta { font-size: 11px; color: var(--fg-dim); display: flex; flex-wrap: wrap; gap: 6px; }
+  a { color: var(--accent-2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .empty { color: var(--fg-dim); padding: 40px 20px; text-align: center; font-size: 14px; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #00211a; padding: 10px 18px; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .pool-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pool-col-title { font-size: 11px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.08em; padding-bottom: 6px; margin-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .pool-col-title span { color: var(--accent); font-weight: 700; margin-left: 4px; }
+  .pool-list { max-height: 56vh; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+  .pool-empty { color: var(--fg-dim); font-size: 11px; padding: 6px 0; }
+  .pool-row { display: grid; grid-template-columns: 1fr 60px 24px; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 4px; border-left: 3px solid var(--border); background: var(--bg-3); font-size: 12px; cursor: pointer; transition: background 0.1s; }
+  .pool-row:hover { background: var(--bg-2); }
+  .pool-row .pr-title { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--fg); }
+  .pool-row .pr-date { font-size: 9px; color: var(--fg-dim); text-align: right; }
+  .pool-row .pr-btn { background: transparent; border: none; color: var(--fg-dim); padding: 2px 4px; font-size: 11px; cursor: pointer; }
+  .pool-row .pr-btn:hover { color: var(--danger); background: transparent; }
+  /* 후보 풀 v2 — 확장형 카드 */
+  .cand-list { display: flex; flex-direction: column; gap: 10px; max-height: 72vh; overflow-y: auto; padding-right: 4px; }
+  .cand-card { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-2); overflow: hidden; }
+  .cand-card .cand-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: pointer; transition: background 0.1s; }
+  .cand-card .cand-header:hover { background: var(--bg-3); }
+  .cand-card .cand-front { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .cand-card .cand-title { flex: 1; font-size: 13px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cand-card .cand-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .cand-card .cand-meta .cand-date { font-size: 9px; color: var(--fg-dim); }
+  .cand-card .cand-refs-badge { font-size: 9px; padding: 2px 6px; border-radius: 999px; font-weight: 700; }
+  .cand-card .cand-refs-badge.ready { background: var(--accent); color: #00211a; }
+  .cand-card .cand-refs-badge.partial { background: var(--warn); color: #1a1a00; }
+  .cand-card .cand-refs-badge.empty { background: var(--bg-3); color: var(--fg-dim); border: 1px solid var(--border); }
+  .cand-card .cand-body { display: none; padding: 0 12px 12px; border-top: 1px solid var(--border); }
+  .cand-card.open .cand-body { display: block; }
+  .cand-card .cand-info { padding: 10px 0 8px; font-size: 12px; color: var(--fg-dim); line-height: 1.5; }
+  .cand-card .cand-info .hook { font-size: 13px; color: var(--fg); font-weight: 600; background: rgba(94,234,212,0.08); border-left: 3px solid var(--accent); padding: 6px 10px; border-radius: 4px; margin: 6px 0; }
+  .cand-card .cand-actions { display: flex; gap: 6px; margin: 8px 0; flex-wrap: wrap; }
+  .cand-card .vid-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .cand-card .vid-row { display: grid; grid-template-columns: 24px 120px 1fr 70px 60px; align-items: center; gap: 8px; padding: 6px 8px; background: var(--bg-3); border-radius: 6px; font-size: 11px; cursor: pointer; transition: background 0.15s; }
+  .cand-card .vid-row:hover { background: rgba(94,234,212,0.08); }
+  .cand-card .vid-row.selected { background: rgba(94,234,212,0.12); border: 1px solid var(--accent); }
+  .cand-card .vid-row input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; }
+  .cand-card .vid-row .vid-thumb { width: 120px; height: 68px; object-fit: cover; border-radius: 4px; background: var(--bg-3); }
+  .cand-card .vid-row .vid-info { min-width: 0; }
+  .cand-card .vid-row .vid-title { font-size: 12px; font-weight: 600; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cand-card .vid-row .vid-ch { font-size: 10px; color: var(--fg-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cand-card .vid-row .vid-views { font-size: 11px; color: var(--accent); font-weight: 700; text-align: right; }
+  .cand-card .vid-row .vid-dur { font-size: 10px; color: var(--fg-dim); text-align: right; }
+  .cand-card .vid-searching { padding: 16px; text-align: center; color: var(--fg-dim); font-size: 12px; }
+  .cand-card .vid-empty { padding: 12px; text-align: center; color: var(--fg-dim); font-size: 11px; }
+  .ctr-badge { font-size: 18px; font-weight: 800; padding: 6px 12px; border-radius: 8px; white-space: nowrap; line-height: 1; }
+  .ctr-badge .lbl { font-size: 9px; display: block; font-weight: 500; opacity: 0.7; letter-spacing: 0.1em; text-transform: uppercase; }
+  .ctr-badge.strong { background: #eaff00; color: #1a1a00; box-shadow: 0 0 16px rgba(234,255,0,0.35); }
+  .ctr-badge.ok { background: #3b82f6; color: #fff; }
+  .ctr-badge.weak { background: var(--bg-3); color: var(--fg-dim); border: 1px solid var(--border); }
+  .top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .ctr-axes { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin-top: 2px; }
+  .ctr-ax { position: relative; font-size: 9px; color: var(--fg-dim); text-align: center; cursor: help; min-width: 0; }
+  .ctr-ax .bar { height: 22px; background: var(--bg-3); border-radius: 2px; position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+  .ctr-ax .fill { width: 100%; background: var(--accent); transition: height 0.15s; }
+  .ctr-ax.penalty .fill { background: var(--danger); }
+  .ctr-ax .val { font-size: 10px; color: var(--fg); font-weight: 700; margin-top: 2px; }
+  .ctr-ax .lbl { font-size: 9px; color: var(--fg-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ctr-ax .tip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 11px; white-space: normal; width: 180px; z-index: 50; margin-bottom: 4px; border: 1px solid var(--border); text-align: left; line-height: 1.35; }
+  .ctr-ax:hover .tip { display: block; }
+  .section-label { font-size: 9px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 6px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+  .modal { background: var(--bg-2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; min-width: 480px; max-width: 600px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .modal h2 { margin-top: 0; }
+  .modal .hint { font-size: 12px; color: var(--fg-dim); margin-bottom: 16px; }
+  .key-row { margin-bottom: 16px; }
+  .key-row label { display: block; font-size: 12px; color: var(--fg-dim); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .key-input-wrap { display: flex; gap: 4px; }
+  .key-input-wrap input { flex: 1; background: var(--bg-3); border: 1px solid var(--border); color: var(--fg); padding: 8px 12px; border-radius: 6px; font-family: monospace; font-size: 13px; }
+  .key-input-wrap .eye { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg); padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+  .key-status { font-size: 11px; margin-top: 4px; min-height: 16px; }
+  .key-status.ok { color: var(--accent); }
+  .key-status.error { color: var(--danger); }
+  /* 다중 YouTube 키 (프로필·API·사용량) */
+  .yt-keys-head, .yt-key-row { display: grid; grid-template-columns: 120px 1fr 96px 28px; gap: 6px; align-items: center; }
+  .yt-keys-head { font-size: 10px; color: var(--fg-dim); margin-bottom: 4px; padding: 0 2px; }
+  .yt-key-list { display: flex; flex-direction: column; gap: 6px; }
+  .yt-key-row input { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg); padding: 7px 9px; border-radius: 6px; font-size: 12px; min-width: 0; }
+  .yt-key-row input.k-key { font-family: monospace; }
+  .yt-key-use { font-size: 11px; text-align: center; color: var(--fg-dim); white-space: nowrap; }
+  .yt-key-use.ok { color: var(--accent); }
+  .yt-key-use.exhausted { color: var(--danger); font-weight: 700; }
+  .yt-key-del { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg-dim); border-radius: 6px; cursor: pointer; padding: 6px 0; font-size: 12px; }
+  .yt-key-del:hover { color: var(--danger); border-color: var(--danger); }
+  .yt-key-add { margin-top: 8px; background: var(--bg-3); border: 1px dashed var(--border); color: var(--fg-dim); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .yt-key-add:hover { color: var(--fg); border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+  .modal-actions button.danger { background: rgba(239,68,68,0.15); border-color: var(--danger); color: var(--danger); }
+  .tabs { display: flex; gap: 4px; margin-right: 8px; }
+  .tab { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .tab.active { background: var(--accent); color: #00211a; border-color: var(--accent); font-weight: 600; }
+  .tab-breakout.active { background: #ff5a3c; color: #fff; border-color: #ff5a3c; }
+  /* === 🚨 떡상 리더보드 === */
+  .bo-wrap { max-width: 920px; margin: 0 auto; padding: 4px 0 40px; }
+  .bo-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 8px 4px 16px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .bo-title { font-size: 19px; font-weight: 800; }
+  .bo-sub { display: block; font-size: 12px; color: var(--fg-dim); margin-top: 4px; max-width: 620px; line-height: 1.4; }
+  .bo-meta { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .bo-date { font-size: 12px; color: var(--fg-dim); }
+  .bo-mng { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg-dim); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; }
+  .bo-mng:hover { color: var(--fg); }
+  .bo-sched { display: inline-flex; align-items: center; gap: 4px; }
+  .bo-sched-hour { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg-dim); border-radius: 5px; padding: 4px 6px; font-size: 11px; }
+  #bo-sched-toggle.on, #bo-auto-toggle.on { background: rgba(74,222,128,0.15); border-color: #4ade80; color: #4ade80; }
+  #bo-auto-toggle.on b { color: #4ade80; }
+  #bo-sched-toggle.on b { color: #4ade80; }
+  #boSchedState { font-weight: 700; }
+  .bo-empty { text-align: center; color: var(--fg-dim); padding: 60px 20px; line-height: 1.7; }
+  .bo-sort { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .bo-sort-lbl { font-size: 11px; color: var(--fg-dim); margin-right: 2px; }
+  .bo-sort-btn { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg-dim); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .bo-sort-btn:hover { color: var(--fg); }
+  .bo-sort-btn.active { background: var(--accent); color: #00211a; border-color: var(--accent); font-weight: 600; }
+  .bo-sort-sep { color: var(--border); margin: 0 4px; user-select: none; }
+  /* 스냅 슬라이더 — 정해진 눈금만 밟는다(연속값 아님). 버튼 8개가 먹던 가로를 압축. */
+  .bo-slider { display: flex; align-items: center; gap: 8px; }
+  .bo-slider-val { font-size: 12px; font-weight: 700; color: #ff5a3c; min-width: 52px; text-align: right;
+                   white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .bo-slider.subs .bo-slider-val { color: #60a5fa; }
+  .bo-slider-wrap { position: relative; width: 128px; height: 18px; display: flex; align-items: center; }
+  /* 눈금 점 — 어디에 멈추는지 보이게. 트랙 위에 깔고 thumb이 그 위를 지난다. */
+  .bo-ticks { position: absolute; inset: 0; display: flex; justify-content: space-between;
+              align-items: center; pointer-events: none; padding: 0 6px; }
+  .bo-ticks i { width: 2px; height: 2px; border-radius: 50%; background: var(--border); }
+  .bo-slider input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+              background: var(--bg-3); border: 1px solid var(--border); border-radius: 3px;
+              outline: none; cursor: pointer; margin: 0; position: relative; z-index: 1; }
+  .bo-slider input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none;
+              width: 13px; height: 13px; border-radius: 50%; background: #ff5a3c;
+              border: 2px solid var(--bg-2); cursor: pointer; }
+  .bo-slider input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%;
+              background: #ff5a3c; border: 2px solid var(--bg-2); cursor: pointer; }
+  .bo-slider.subs input[type=range]::-webkit-slider-thumb { background: #60a5fa; }
+  .bo-slider.subs input[type=range]::-moz-range-thumb { background: #60a5fa; }
+  .bo-min-none { text-align: center; color: var(--fg-dim); padding: 40px 20px; font-size: 13px; line-height: 1.6; }
+  .bo-collect { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); border: 1px solid var(--accent); color: #00211a; padding: 5px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; }
+  .bo-sort .bo-date { font-size: 11px; color: var(--fg-dim); white-space: nowrap; }
+  .bo-collect:hover { filter: brightness(1.1); }
+  .bo-collect:disabled { background: var(--bg-3); border-color: var(--border); color: var(--fg-dim); cursor: default; }
+  .bo-spin { display: inline-block; width: 12px; height: 12px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: bo-spin 0.7s linear infinite; }
+  @keyframes bo-spin { to { transform: rotate(360deg); } }
+  .bo-last { color: var(--fg-dim); }
+  .bo-section { margin-bottom: 18px; }
+  .bo-sec-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 6px 4px; cursor: pointer; user-select: none; }
+  .bo-sec-head .cnt { color: var(--fg-dim); font-weight: 400; }
+  .bo-sec-head .caret { margin-left: auto; color: var(--fg-dim); font-size: 11px; }
+  /* 2열 카드 그리드 */
+  .bo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (max-width: 760px) { .bo-grid { grid-template-columns: 1fr; } }
+  .bo-card { display: flex; flex-direction: column; gap: 8px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+  .bo-card.hot { border-color: #ff5a3c; box-shadow: 0 0 0 1px rgba(255,90,60,0.2); }
+  .bo-card.rising { border-color: #f5a623; }
+  .bo-card.base { opacity: 0.72; }
+  /* 상단: 랭크 + 썸네일 + 제목 */
+  .bo-card-top { display: flex; gap: 10px; align-items: flex-start; }
+  .bo-rank { font-size: 13px; font-weight: 800; color: var(--fg-dim); min-width: 18px; text-align: center; padding-top: 2px; }
+  .bo-thumb { flex: 0 0 auto; width: 112px; aspect-ratio: 16/9; border-radius: 6px; overflow: hidden; background: var(--bg-3); display: block; }
+  .bo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bo-thumb-empty { display: flex; align-items: center; justify-content: center; color: var(--fg-dim); font-size: 20px; }
+  .bo-card-head { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .bo-card-src { display: flex; gap: 6px; align-items: center; font-size: 11px; }
+  .bo-card-src .chnl { color: #ff8a6c; font-weight: 700; }
+  .bo-card-title { font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--fg); text-decoration: none; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .bo-card-title:hover { color: var(--accent); }
+  /* 판단 핵심 3지표 + 받기 — 한 행에 나란히, 속도가 가장 강조 */
+  .bo-stats { display: grid; grid-template-columns: 1.3fr 1fr 0.9fr 0.8fr; gap: 6px; align-items: center; background: var(--bg-3); border-radius: 7px; padding: 8px 10px; }
+  .bo-stats.has-take { grid-template-columns: 1.3fr 1fr 0.9fr 0.8fr auto; }
+  .bo-stat-eff .v { color: var(--fg-dim); }
+  .bo-stat-eff.pop .v { color: #60a5fa; }
+  .bo-stat { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .bo-stat .v { font-size: 14px; font-weight: 700; white-space: nowrap; }
+  .bo-stat .k { font-size: 9px; color: var(--fg-dim); white-space: nowrap; }
+  .bo-stat-speed { border-right: 1px solid var(--border); padding-right: 8px; }
+  .bo-stat-speed .v { font-size: 17px; font-weight: 800; }
+  .bo-stat-speed.up .v { color: #4ade80; }
+  .bo-stat-speed.est .v { color: #fbbf24; }
+  .bo-stat-speed.flat .v { color: var(--fg-dim); }
+  .bo-take { background: #ff5a3c; color: #fff; border: none; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; white-space: nowrap; align-self: center; }
+  .bo-take:hover { background: #ff7a5c; }
+  .bo-take:disabled { background: var(--bg-3); color: var(--fg-dim); cursor: default; }
+  /* 채널 목록: 채널명+UC만이라 2열. 15줄(=30개) 넘으면 스크롤 */
+  .bo-wl { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; max-height: 480px; overflow-y: auto; margin-bottom: 12px; align-content: start; }
+  .bo-wl-row { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 6px 8px; background: var(--bg-3); border-radius: 5px; min-width: 0; }
+  .bo-wl-row > span:first-child { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bo-wl-row .cid { margin-left: auto; flex: 0 0 auto; }
+  .bo-wl-del { background: none; border: none; color: var(--fg-dim); cursor: pointer; padding: 2px 6px; border-radius: 4px; }
+  .bo-wl-del:hover { color: var(--danger); background: var(--bg-2); }
+  .bo-wl-open { background: none; border: none; color: var(--fg-dim); cursor: pointer; padding: 2px 4px; border-radius: 4px; text-decoration: none; font-size: 11px; }
+  .bo-wl-open:hover { color: var(--fg); background: var(--bg-2); }
+  .bo-wl-row .cid { color: var(--fg-dim); font-family: monospace; font-size: 10px; }
+  .bo-add { display: flex; gap: 8px; }
+  .bo-add input { background: var(--bg-3); border: 1px solid var(--border); color: var(--fg); padding: 7px 10px; border-radius: 6px; font-size: 12px; }
+  .yt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 14px; }
+  .yt-card { background: var(--bg-2); border: 1px solid var(--border); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+  .yt-card .yt-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .yt-card .yt-title { font-size: 17px; font-weight: 700; line-height: 1.2; }
+  .yt-card .yt-meta { font-size: 11px; color: var(--fg-dim); margin-top: 4px; }
+  .yt-section { font-size: 12px; line-height: 1.55; }
+  .yt-section .lbl { font-size: 10px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
+  .yt-section ul { margin: 0; padding-left: 18px; color: var(--fg-dim); }
+  .yt-section.miss .lbl { color: var(--warn); }
+  .yt-section.miss ul { color: var(--fg); font-weight: 500; }
+  .yt-section.miss ul li { padding: 1px 0; }
+  .yt-angles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 8px 0; }
+  .yt-angles-grid > .yt-section { background: rgba(0,0,0,0.18); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .yt-angles-grid > .yt-section.miss { border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.05); }
+  .yt-hook { background: linear-gradient(135deg, rgba(94,234,212,0.12), rgba(94,234,212,0.04)); border: 1px solid var(--accent); padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+  .yt-hook .lbl { font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; }
+  .yt-hook .hk { font-size: 14px; font-weight: 600; color: var(--fg); margin-bottom: 4px; }
+  .yt-hook .tt { font-size: 12px; color: var(--fg-dim); }
+  .yt-hook .why { font-size: 11px; color: var(--fg-dim); margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); }
+  .yt-stats { display: flex; gap: 14px; font-size: 11px; color: var(--fg-dim); flex-shrink: 0; }
+  .yt-stats .metric { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .yt-stats .metric b { color: var(--accent); font-size: 18px; line-height: 1; font-weight: 800; }
+  .yt-stats .metric.high b { color: var(--accent); }
+  .yt-stats .metric.mid b { color: var(--warn); }
+  .yt-stats .metric.low b { color: var(--fg-dim); }
+  .yt-stats .metric span { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .yt-empty { color: var(--fg-dim); padding: 40px 20px; text-align: center; }
+  .opp-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; white-space: nowrap; }
+  .opp-badge.gold { background: #eaff00; color: #1a1a00; box-shadow: 0 0 12px rgba(234,255,0,0.4); }
+  .opp-badge.ok { background: rgba(94,234,212,0.18); color: var(--accent); border: 1px solid var(--accent); }
+  .opp-badge.mixed { background: rgba(94,234,212,0.10); color: var(--accent); border: 1px solid rgba(94,234,212,0.4); }
+  .opp-badge.weak { background: var(--bg-3); color: var(--fg-dim); border: 1px solid var(--border); }
+  .opp-badge.gray { background: var(--bg-3); color: var(--fg-dim); border: 1px solid var(--border); }
+  .opp-badge.trap { background: rgba(251,191,36,0.18); color: var(--warn); border: 1px solid var(--warn); }
+  .opp-badge.red { background: rgba(248,113,113,0.18); color: var(--danger); border: 1px solid var(--danger); }
+  .yt-copy-pick { background: rgba(234,255,0,0.05); border: 1px solid rgba(234,255,0,0.35); padding: 10px 12px; border-radius: 8px; }
+  .yt-copy-pick .lbl { color: #eaff00 !important; }
+  .cs-badge { display: inline-block; background: #eaff00; color: #1a1a00; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 999px; margin-left: 4px; vertical-align: middle; }
+  .yt-top-videos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .yt-top-section .lbl { font-size: 10px; color: var(--fg-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 600; }
+  .vid-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .vid-list li { font-size: 11px; line-height: 1.35; }
+  .vid-list a { color: var(--fg); text-decoration: none; display: block; padding: 6px 8px; background: var(--bg-3); border-radius: 4px; border-left: 2px solid transparent; transition: all 0.1s; }
+  .vid-list a:hover { border-left-color: var(--accent); background: var(--bg-2); }
+  .vid-list .vt { color: var(--fg); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .vid-list .vm { color: var(--fg-dim); font-size: 9px; margin-top: 3px; display: flex; gap: 8px; }
+  .vid-list .vm .views { color: var(--accent); font-weight: 600; }
+  .yt-hook-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+  .yt-hook-row > .yt-hook, .yt-hook-row > .yt-related { height: 100%; }
+  .yt-related { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.4); padding: 12px 14px; border-radius: 8px; }
+  .yt-related .lbl { color: var(--accent-2) !important; }
+  @media (max-width: 1100px) { .yt-hook-row { grid-template-columns: 1fr; } }
+  .related-rss-list { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-direction: column; gap: 4px; }
+  .related-rss-list li a { display: flex; gap: 8px; align-items: center; padding: 5px 8px; background: var(--bg-3); border-radius: 4px; border-left: 2px solid var(--accent-2); color: var(--fg); font-size: 11px; line-height: 1.35; cursor: pointer; }
+  .related-rss-list li a:hover { background: var(--bg-2); text-decoration: none; }
+  .related-rss-list .rr-score { color: var(--accent-2); font-weight: 700; font-size: 10px; min-width: 30px; flex-shrink: 0; }
+  .related-rss-list .rr-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* YT 목차 배지 (영상 개수 — CTR과 다른 색) */
+  .toc-item .yt-count { flex-shrink: 0; font-size: 10px; font-weight: 700; padding: 2px 5px; border-radius: 3px; min-width: 26px; text-align: center; line-height: 1.3; background: var(--bg-3); color: var(--fg-dim); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<header>
+  <!-- 1. 타이틀 (1단) -->
+  <div class="hgroup title">
+    <h1>📡 뉴스 레이더</h1>
+  </div>
+  <!-- 2. 떡상 탭 (채널/탭 묶음 앞 독립 카드) -->
+  <div class="hgroup" style="padding:4px 6px">
+    <div class="tabs">
+      <button class="tab tab-breakout active" data-tab="breakout">🚨 떡상</button>
+    </div>
+  </div>
+  <!-- 3. 채널 선택 + YouTube/RSS 탭 (한 묶음 카드) -->
+  <div class="hgroup" style="padding:4px 12px">
+    <div class="col">
+      <span class="lbl">채널</span>
+      <select id="channelSel" style="background:var(--bg-2);color:var(--fg);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:12px;font-weight:600;min-width:110px"></select>
+    </div>
+    <div class="tabs">
+      <button class="tab" data-tab="youtube">📺 YouTube</button>
+      <button class="tab" data-tab="rss">📰 RSS</button>
+    </div>
+  </div>
+  <!-- 4. 마지막 실행 + 신호등 -->
+  <div class="hgroup" id="window-info-group">
+    <div class="col" id="rssWinCol" style="display:none">
+      <span class="lbl">RSS 마지막 실행</span>
+      <span class="val" id="winLast">—</span>
+    </div>
+    <div class="col" id="ytWinCol">
+      <span class="lbl">YT 마지막 분석</span>
+      <span class="val" id="ytWinLast">—</span>
+    </div>
+  </div>
+  <div style="flex:1"></div>
+  <!-- 5. 액션 버튼 그룹 (통일된 크기) -->
+  <div class="hgroup btns">
+    <button id="btn-run" class="hbtn primary"><span class="pbar"></span><span class="ic">▶</span><span class="tx">분석 실행</span><span class="pct"></span></button>
+    <button id="btn-dry" class="hbtn"><span class="pbar"></span><span class="ic">🔍</span><span class="tx">Dry-run</span><span class="pct"></span></button>
+    <button id="btn-refresh" class="hbtn"><span class="ic">↻</span><span class="tx">새로고침</span></button>
+    <button id="btn-settings" class="hbtn icon" title="API 키 설정">⚙️</button>
+  </div>
+  <!-- 6. 상태 -->
+  <div class="hgroup" id="status-group" style="min-width:200px;max-width:280px">
+    <div class="col" style="overflow:hidden">
+      <span class="lbl">상태</span>
+      <span id="run-status" class="val" style="font-size:11px;color:var(--fg-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</span>
+    </div>
+  </div>
+</header>
+
+<div class="filter-bar" id="filter-bar">
+  <!-- A. 날짜 + 정렬 (가로 2단, 라벨:값) -->
+  <div class="fgroup">
+    <div class="col" style="gap:4px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="lbl" style="min-width:32px">날짜</span>
+        <select id="dateSel" style="display:none"></select>
+        <select id="ytDateSel"></select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="lbl" style="min-width:32px">정렬</span>
+        <select id="sortSel" style="display:none">
+          <option value="ctr">CTR ↓</option>
+          <option value="total">분류 ↓</option>
+          <option value="daily">일상 ↓</option>
+          <option value="novelty">새로움 ↓</option>
+          <option value="impact">충격 ↓</option>
+        </select>
+        <select id="ytSortSel">
+          <option value="opportunity">기회 등급</option>
+          <option value="competition">경쟁 ↑</option>
+          <option value="demand">수요 ↓</option>
+          <option value="videos">영상 수 ↓</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <!-- B. RSS 슬라이더 -->
+  <div class="fgroup" id="rssSliders" style="display:none">
+    <div class="col" style="gap:4px">
+      <div class="threshold-mini"><span style="min-width:32px">분류</span><input type="range" id="thSlider" min="0" max="30" step="0.5" value="18"><span class="threshold-val" id="thVal">18</span></div>
+      <div class="threshold-mini"><span style="min-width:32px">CTR</span><input type="range" id="ctrSlider" min="0" max="100" step="1" value="65"><span class="threshold-val" id="ctrVal">65</span></div>
+    </div>
+  </div>
+  <!-- B'. YT 슬라이더 (3행) -->
+  <div class="fgroup" id="ytSliders">
+    <div class="col" style="gap:4px">
+      <div class="threshold-mini"><span style="min-width:42px">수요≥</span><input type="range" id="ytDemSlider" min="1" max="5" step="1" value="1"><span class="threshold-val" id="ytDemVal">1</span></div>
+      <div class="threshold-mini"><span style="min-width:42px">경쟁≤</span><input type="range" id="ytCmpSlider" min="1" max="5" step="1" value="5"><span class="threshold-val" id="ytCmpVal">5</span></div>
+      <div class="threshold-mini"><span style="min-width:42px">기회</span><input type="range" id="ytOppSlider" min="1" max="7" step="1" value="7"><span id="ytOppDot" class="opp-dot-val" title="전체"></span></div>
+    </div>
+  </div>
+  <!-- C. 분야 칩 -->
+  <div class="fgroup chips">
+    <div class="front-chips-inline" id="frontChips"></div>
+  </div>
+  <!-- D. 통계 + 누적 풀 -->
+  <div class="fgroup stats">
+    <div class="stat-pair" id="rssStats" style="display:none">
+      <span>📰 수집 <b id="stRaw">-</b></span>
+      <span>⭐ 후보 <b id="stCand">-</b></span>
+      <span>✂ 필터 <b id="stFiltered">-</b></span>
+      <span>👁 감시 <b id="stWatch">-</b></span>
+    </div>
+    <div id="ytStats"></div>
+    <div style="display:flex;flex-direction:column;gap:4px;align-self:center">
+      <button id="btn-show-candidates" style="background:var(--bg-2);border:1px solid var(--border);color:var(--fg-dim);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px">⭐ 후보 풀</button>
+      <button id="btn-show-archived" style="background:var(--bg-2);border:1px solid var(--border);color:var(--fg-dim);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px">🚫 제외 풀</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div id="view-rss" style="display:none">
+    <aside class="toc" id="toc-rss"></aside>
+    <main class="cards-area">
+      <div id="grid" class="grid"></div>
+      <div id="empty" class="empty" style="display:none">표시할 항목이 없습니다. 임계값을 낮추거나 다른 날짜를 선택하세요.</div>
+    </main>
+  </div>
+  <div id="view-youtube" style="display:contents">
+    <aside class="toc" id="toc-yt"></aside>
+    <main class="cards-area">
+      <div id="ytGrid" class="yt-grid"></div>
+      <div id="ytEmpty" class="yt-empty" style="display:none">YouTube 분석 결과가 아직 없습니다. 상단 ▶ 분석 실행 버튼을 눌러주세요.</div>
+    </main>
+  </div>
+  <!-- 🚨 떡상 감시기 — 좌 분류 사이드바 + 우 감지 -->
+  <div id="view-breakout" style="display:none">
+    <aside class="bo-cats">
+      <div class="bo-cats-head">
+        <span class="bo-cats-title">분류</span>
+        <span class="bo-cats-actions">
+          <button id="bo-cat-add" class="bo-cats-btn" title="분류 추가">+ 추가</button>
+        </span>
+      </div>
+      <div id="boCatList" class="bo-cat-list"></div>
+      <!-- 자동 감지(전체 분류에 적용) -->
+      <div class="bo-sched">
+        <button id="bo-sched-toggle" class="bo-mng" title="매일 정해진 시각에 전체 분류 자동 감지 (Windows 작업 스케줄러)">⏰ 자동 <b id="boSchedState">…</b></button>
+        <select id="boSchedHour" class="bo-sched-hour" title="자동 실행 시각">
+          <option value="6">06시</option><option value="7">07시</option><option value="8">08시</option>
+          <option value="9" selected>09시</option><option value="10">10시</option><option value="12">12시</option>
+          <option value="18">18시</option><option value="21">21시</option><option value="23">23시</option>
+        </select>
+      </div>
+    </aside>
+    <main class="cards-area">
+      <div class="bo-wrap">
+        <div class="bo-head">
+          <div>
+            <span class="bo-title">🚨 <span id="boCatTitle">떡상 감시</span></span>
+            <span class="bo-sub">선택 분류 채널에서 지금 뜨는 영상을 속도지수순으로.</span>
+          </div>
+          <span id="boDate" class="bo-date" style="align-self:flex-end">—</span>
+        </div>
+        <div id="boSort" class="bo-sort">
+          <span class="bo-sort-lbl">정렬</span>
+          <button class="bo-sort-btn active" data-sort="score">속도지수순</button>
+          <button class="bo-sort-btn" data-sort="views">조회수순</button>
+          <button class="bo-sort-btn" data-sort="eff">효율순</button>
+          <button class="bo-sort-btn" data-sort="date">날짜순</button>
+          <span class="bo-sort-sep">|</span>
+          <span class="bo-sort-lbl">조회수</span>
+          <div class="bo-slider views">
+            <div class="bo-slider-wrap">
+              <div class="bo-ticks" id="boMinTicks"></div>
+              <input type="range" id="boMinRange" min="0" max="7" step="1" value="2"
+                     title="조회수 최소 기준 — 좌우로 밀면 정해진 눈금에 맞춰집니다">
+            </div>
+            <span class="bo-slider-val" id="boMinVal">50만↑</span>
+          </div>
+          <span class="bo-sort-lbl">구독자</span>
+          <div class="bo-slider subs">
+            <div class="bo-slider-wrap">
+              <div class="bo-ticks" id="boSubTicks"></div>
+              <input type="range" id="boSubRange" min="0" max="7" step="1" value="0"
+                     title="구독자 최대 기준 — 오른쪽으로 밀수록 더 작은 채널만 (왼쪽 끝은 전체)">
+            </div>
+            <span class="bo-slider-val" id="boSubVal">전체</span>
+          </div>
+          <button id="bo-collect" class="bo-collect" style="margin-left:auto" title="지금 선택 분류를 훑어 떡상을 감지합니다">🔄 지금 감지</button>
+        </div>
+        <div id="boEmpty" class="bo-empty">이 분류는 아직 데이터가 없습니다. 좌측 ⚙로 채널을 등록하고 🔄 지금 감지를 누르세요.</div>
+        <div id="boBoard"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 떡상 채널 관리 모달 -->
+<div id="modal-breakout" class="modal-overlay" style="display:none">
+  <div class="modal" style="min-width:560px;max-width:720px">
+    <h2>⚙ <span id="boMngCatName">분류</span> 채널 관리 <span style="font-size:11px;color:var(--fg-dim);font-weight:400">— 채널 URL을 넣으면 등록됩니다</span></h2>
+    <div id="boWhitelist" class="bo-wl"></div>
+    <div class="bo-add">
+      <input id="boAddInput" type="text" placeholder="채널 URL 또는 @핸들 또는 채널명" style="flex:1">
+      <button id="bo-add-btn" class="primary">+ 추가</button>
+    </div>
+    <div id="boAddMsg" style="font-size:11px;color:var(--fg-dim);min-height:16px;margin-top:6px"></div>
+    <div class="modal-actions">
+      <button id="bo-cat-delete" class="danger">🗑 이 분류 삭제</button>
+      <button id="bo-copy-links" class="bo-mng" title="이 분류의 채널 링크를 전부 클립보드로 복사합니다">⧉ 전체 링크 복사</button>
+      <button id="bo-auto-toggle" class="bo-mng" title="매일 자동 감지(전체 순회)에 이 분류를 포함할지. OFF면 방치해도 쿼터 안 씀" style="margin-right:auto">자동수집 <b id="boAutoState">…</b></button>
+      <button onclick="document.getElementById('modal-breakout').style.display='none'">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-cat-add" class="modal-overlay" style="display:none">
+  <div class="modal" style="min-width:400px;max-width:480px">
+    <h2>+ 분류 추가</h2>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <input id="catAddName" type="text" placeholder="분류 이름 (예: 경제, 심리, 과학)" style="background:var(--bg-3);border:1px solid var(--border);color:var(--fg);padding:8px 10px;border-radius:6px">
+    </div>
+    <div style="font-size:11px;color:var(--fg-dim);margin-top:6px;line-height:1.5">
+      새 분류는 <b>자동 수집 꺼짐(⏸)</b> 으로 시작합니다.<br>
+      채널을 등록한 뒤 ⚙에서 켜면 매일 자동 감지에 들어갑니다.
+    </div>
+    <div id="catAddMsg" style="font-size:11px;color:var(--fg-dim);min-height:16px;margin-top:6px"></div>
+    <div class="modal-actions">
+      <button id="cat-add-confirm" class="primary">추가</button>
+      <button onclick="document.getElementById('modal-cat-add').style.display='none'">취소</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-candidates" class="modal-overlay" style="display:none">
+  <div class="modal" style="min-width:760px;max-width:960px">
+    <h2>⭐ 후보 풀 <span style="font-size:11px;color:var(--fg-dim);font-weight:400">— 카드 클릭으로 펼치기 → 🔍 영상 검색 → 레퍼런스 선택</span></h2>
+    <div class="cand-list" id="candListV2"></div>
+    <div class="modal-actions"><button onclick="document.getElementById('modal-candidates').style.display='none'">닫기</button></div>
+  </div>
+</div>
+
+<div id="modal-archived" class="modal-overlay" style="display:none">
+  <div class="modal" style="min-width:680px;max-width:820px">
+    <h2>🚫 제외 풀 <span style="font-size:11px;color:var(--fg-dim);font-weight:400">— 클릭 시 카드로 이동, ↩로 복원</span></h2>
+    <div class="pool-cols">
+      <div>
+        <div class="pool-col-title">📺 YouTube <span id="archYtCount">0</span></div>
+        <div class="pool-list" id="archListYt"><div class="pool-empty">비어 있음</div></div>
+      </div>
+      <div>
+        <div class="pool-col-title">📰 RSS <span id="archRssCount">0</span></div>
+        <div class="pool-list" id="archListRss"><div class="pool-empty">비어 있음</div></div>
+      </div>
+    </div>
+    <div class="modal-actions"><button onclick="document.getElementById('modal-archived').style.display='none'">닫기</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div id="modal-settings" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <h2>⚙️ API 키 설정</h2>
+    <p class="hint">키는 브라우저(localStorage)와 백엔드 메모리에만 저장됩니다. 서버 디스크에는 기록되지 않습니다.</p>
+
+    <div class="key-row">
+      <label>YouTube Data API Keys <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener" style="font-size:11px;font-weight:400;color:var(--accent);text-decoration:none;margin-left:6px">키 발급 ↗</a></label>
+      <div class="hint" style="font-size:10px;margin:0 0 6px">다른 구글 계정(프로필)의 키를 여러 개 넣으면 쿼터가 합산됩니다. 하나가 소진되면 자동으로 다음 키로 넘어갑니다. 프로필명은 "이 키가 어느 계정 건지" 본인 식별용입니다.</div>
+      <div class="yt-keys-head">
+        <span class="c-prof">프로필</span><span class="c-key">API 키</span><span class="c-use">오늘 사용량</span><span class="c-del"></span>
+      </div>
+      <div id="ytKeyList" class="yt-key-list"></div>
+      <button id="yt-key-add" type="button" class="yt-key-add">+ 키 추가</button>
+      <div class="key-status" id="status-youtube"></div>
+    </div>
+
+    <div class="key-row">
+      <label>Anthropic API Key (옵션) <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener" style="font-size:11px;font-weight:400;color:var(--accent);text-decoration:none;margin-left:6px">키 발급 ↗</a></label>
+      <div class="key-input-wrap">
+        <input type="password" id="key-anthropic" placeholder="sk-ant-... (claude CLI 사용 시 불필요)">
+        <button class="eye" data-target="key-anthropic" title="표시/숨김">👁</button>
+      </div>
+      <div class="key-status" id="status-anthropic"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button id="btn-test-youtube">YouTube 키 테스트</button>
+      <button id="btn-save-keys" class="primary">저장</button>
+      <button id="btn-clear-keys" class="danger">전체 삭제</button>
+      <button id="btn-close-settings">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const BACKEND = "http://127.0.0.1:8091";
+let POLL_TIMER = null;
+
+const AXES = [
+  { id: "impact", name: "충격" },
+  { id: "daily", name: "일상" },
+  { id: "novelty", name: "새로움" },
+  { id: "search", name: "검색" },
+  { id: "visual", name: "시각" },
+];
+
+// CTR 8축 (config.json의 ctr_scoring.axes로 덮어씀)
+let CTR_AXES = [
+  { id: "hook_strength", name: "후크", weight: 1.5, guide: "" },
+  { id: "daily_entry", name: "일상", weight: 1.5, guide: "" },
+  { id: "number_shock", name: "숫자", weight: 1.2, guide: "" },
+  { id: "provocation", name: "도발", weight: 1.2, guide: "" },
+  { id: "search_volume", name: "검색", weight: 1.0, guide: "" },
+  { id: "familiarity", name: "친숙", weight: 0.8, guide: "" },
+  { id: "thumbnail_match", name: "썸네일", weight: 0.8, guide: "" },
+  { id: "jargon_penalty", name: "학술", weight: -1.0, guide: "" },
+];
+
+let CONFIG = null;
+let DAILY = null;
+let YT_DATA = null;
+let SELECTED_FRONTS = new Set();
+let CANDIDATE_IDS = new Set();
+let ARCHIVED_IDS = new Set();
+let THRESHOLD = 18;
+let CTR_THRESHOLD = 65;
+let SORT_BY = "ctr";
+let YT_DEM_MIN = 1;
+let YT_CMP_MAX = 5;
+let YT_OPP_MIN = 7; // 1=gold만, 7=전체
+let YT_SORT = "opportunity";
+const OPP_ORDER = ["gold", "ok", "mixed", "weak", "gray", "trap", "red"];
+const OPP_COLORS = {gold:"#eaff00", ok:"#5eead4", mixed:"#5eead488", weak:"#8b97ad", gray:"#5b6478", trap:"#fbbf24", red:"#f87171"};
+const OPP_KO = {gold:"황금", ok:"좋음", mixed:"평범", weak:"약함", gray:"무관심", trap:"함정", red:"레드오션"};
+
+// === 채널 컨텍스트 ===
+let CURRENT_CHANNEL = "science";
+let CHANNELS = [];
+
+function withCh(url) {
+  // BACKEND/api/* 또는 상대경로 모두 지원. 이미 ?channel= 있으면 추가하지 않음.
+  if (/[?&]channel=/.test(url)) return url;
+  const sep = url.includes("?") ? "&" : "?";
+  return url + sep + "channel=" + encodeURIComponent(CURRENT_CHANNEL);
+}
+
+async function loadChannels() {
+  try {
+    const r = await fetch(BACKEND + "/api/channels");
+    const j = await r.json();
+    CHANNELS = j.channels || [];
+    if (!CHANNELS.length) CHANNELS = [{id:"science", name:"과학 채널", subtitle:""}];
+    // 저장된 선택 복원
+    const saved = localStorage.getItem("newsradar_channel");
+    if (saved && CHANNELS.some(c => c.id === saved)) {
+      CURRENT_CHANNEL = saved;
+    } else {
+      CURRENT_CHANNEL = j.default || CHANNELS[0].id;
+    }
+  } catch (e) {
+    CHANNELS = [{id:"science", name:"과학 채널", subtitle:""}];
+    CURRENT_CHANNEL = "science";
+  }
+  const sel = document.getElementById("channelSel");
+  sel.innerHTML = CHANNELS.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+  sel.value = CURRENT_CHANNEL;
+  sel.onchange = async () => {
+    CURRENT_CHANNEL = sel.value;
+    localStorage.setItem("newsradar_channel", CURRENT_CHANNEL);
+    syncBtnProgressToChannel();
+    await loadConfig();
+    await reloadAllForChannel();
+  };
+}
+
+async function reloadAllForChannel() {
+  // 채널 변경 시 fronts/선택 상태 리셋 후 전체 데이터 리로드
+  SELECTED_FRONTS = new Set();
+  CANDIDATE_IDS = new Set();
+  ARCHIVED_IDS = new Set();
+  DAILY = null;
+  YT_DATA = null;
+  if (typeof buildFrontChips === "function") buildFrontChips();
+  // 옛 채널 잔상 즉시 비우기 (비동기 fetch 끝나기 전 화면)
+  const wl = document.getElementById("winLast"); if (wl) wl.textContent = "…";
+  const yl = document.getElementById("ytWinLast"); if (yl) yl.textContent = "…";
+  ["toc-rss", "toc-yt", "grid", "ytGrid"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = "";
+  });
+  loadWindowInfo && loadWindowInfo();
+  loadYtWindowInfo && loadYtWindowInfo();
+  loadCandidatesPreview && loadCandidatesPreview();
+  loadArchivedPreview && loadArchivedPreview();
+  // 이 채널이 실행 중이면 폴링 복구
+  await _recoverRunState(CURRENT_CHANNEL);
+  syncBtnProgressToChannel();
+  // 양 탭 모두 갱신 (사용자가 탭 전환해도 최신 상태)
+  const first = await loadDateList();
+  if (first) await loadDaily(first);
+  await loadYtDates();
+}
+
+async function loadConfig() {
+  try {
+    const r = await fetch(withCh(`config/${CURRENT_CHANNEL}.json?t=` + Date.now()));
+    CONFIG = await r.json();
+  } catch (e) {
+    CONFIG = { fronts: [], scoring: { threshold_candidate: 18 } };
+  }
+  THRESHOLD = CONFIG.scoring?.threshold_candidate ?? 18;
+  document.getElementById("thSlider").value = THRESHOLD;
+  document.getElementById("thVal").textContent = THRESHOLD;
+  if (CONFIG.ctr_scoring?.axes?.length) {
+    CTR_AXES = CONFIG.ctr_scoring.axes.map(a => ({
+      id: a.id,
+      name: shortCtrName(a.name || a.id),
+      weight: a.weight,
+      guide: a.guide || "",
+    }));
+  }
+  CTR_THRESHOLD = CONFIG.ctr_scoring?.thresholds?.ok ?? 65;
+  document.getElementById("ctrSlider").value = CTR_THRESHOLD;
+  document.getElementById("ctrVal").textContent = CTR_THRESHOLD;
+}
+
+function shortCtrName(n) {
+  // 2~3자 축약
+  const map = {
+    "후크 강도": "후크", "일상 진입도": "일상", "숫자 충격": "숫자",
+    "도발/궁금증 갭": "도발", "키워드 검색량": "검색", "친숙도 균형": "친숙",
+    "썸네일 매칭": "썸네일", "학술용어 페널티": "학술",
+  };
+  return map[n] || n.slice(0, 3);
+}
+
+async function loadDateList() {
+  let dates = [];
+  try {
+    // 백엔드 채널화 API 사용 (정적 daily/index.json은 채널 격리 안 됨)
+    const r = await fetch(withCh(BACKEND + "/api/dates"));
+    if (r.ok) {
+      const idx = await r.json();
+      dates = idx.dates || [];
+    }
+  } catch (e) {}
+  if (dates.length === 0) {
+    // 하드코딩 fallback: 최근 7일
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today.getTime() - i * 86400000);
+      dates.push(d.toISOString().slice(0, 10));
+    }
+  }
+  const sel = document.getElementById("dateSel");
+  sel.innerHTML = dates.map(d => `<option value="${d}">${d}</option>`).join("");
+  return dates[0];
+}
+
+async function loadDaily(date) {
+  try {
+    const r = await fetch(withCh(BACKEND + `/api/daily/${date}?t=` + Date.now()));
+    if (!r.ok) throw new Error("not found");
+    DAILY = await r.json();
+  } catch (e) {
+    DAILY = { date, stats: {}, items: [] };
+  }
+  document.getElementById("stRaw").textContent = DAILY.stats?.raw_count ?? "-";
+  document.getElementById("stFiltered").textContent = DAILY.stats?.filtered_count ?? "-";
+  document.getElementById("stCand").textContent = DAILY.stats?.candidate_count ?? "-";
+  document.getElementById("stWatch").textContent = DAILY.stats?.watch_count ?? "-";
+  render();
+}
+
+// 풀 항목 → 카드로 점프
+async function jumpToPoolItem(it) {
+  const isYt = it.kind === "youtube";
+  if (isYt) {
+    // id 형식 yt:date:front_id
+    const parts = (it.id || "").split(":");
+    if (parts.length < 3) return;
+    const date = parts[1], front = parts[2];
+    switchTab("youtube");
+    document.getElementById("modal-candidates").style.display = "none";
+    document.getElementById("modal-archived").style.display = "none";
+    const sel = document.getElementById("ytDateSel");
+    if (sel.value !== date) {
+      sel.value = date;
+      await loadYtDaily(date);
+    }
+    // 분야 칩이 꺼져 있으면 켜야 카드가 보임
+    if (!SELECTED_FRONTS.has(front)) {
+      SELECTED_FRONTS.add(front);
+      document.querySelectorAll('#frontChips .chip').forEach(c => {
+        if (c.dataset.front === front) c.classList.add('active');
+      });
+      if (YT_DATA) renderYt(YT_DATA);
+    }
+    // 카드 찾아서 스크롤
+    setTimeout(() => {
+      const cards = document.querySelectorAll('#ytGrid .yt-card');
+      for (const card of cards) {
+        const idx = card.dataset.cardIdx;
+        const tocItem = document.querySelector(`#toc-yt .toc-item[data-idx="${idx}"]`);
+        // front_id로 매칭하기 어려우니 카드에 data-front 추가하는 게 깔끔하지만,
+        // 임시로 첫 번째 매칭: title 텍스트로 (front_name이 yt-title에 들어감)
+        if (card.querySelector('.yt-title')?.textContent === it.front_name) {
+          jumpToCard(idx, card.id, "#toc-yt .toc-item");
+          break;
+        }
+      }
+    }, 50);
+  } else {
+    const date = it.source_date || (it.published || "").slice(0,10);
+    if (!date) { showToast("날짜 정보 없음"); return; }
+    switchTab("rss");
+    document.getElementById("modal-candidates").style.display = "none";
+    document.getElementById("modal-archived").style.display = "none";
+    const sel = document.getElementById("dateSel");
+    sel.value = date;
+    await loadDaily(date);
+    if (!SELECTED_FRONTS.has(it.front_id)) {
+      SELECTED_FRONTS.add(it.front_id);
+      document.querySelectorAll('#frontChips .chip').forEach(c => {
+        if (c.dataset.front === it.front_id) c.classList.add('active');
+      });
+      render();
+    }
+    setTimeout(() => {
+      const cards = document.querySelectorAll('#grid .card');
+      for (const card of cards) {
+        // id 매칭: cardHtml은 id="card-${idx}"이고 data-id 없음. promote 버튼에 data-id 있음.
+        const promoteBtn = card.querySelector(`[data-action="promote"]`);
+        if (promoteBtn && promoteBtn.dataset.id === it.id) {
+          jumpToCard(card.dataset.cardIdx, card.id, "#toc-rss .toc-item");
+          break;
+        }
+      }
+    }, 50);
+  }
+}
+
+function poolRowHtml(it, opts) {
+  const color = it.front_color || '#666';
+  const title = it.kind === "youtube"
+    ? (it.suggested_video?.title || it.suggested_video?.hook || it.title || it.front_name || '')
+    : (it.one_line_summary || it.title || '');
+  const date = (it.source_date || it.id?.split(':')[1] || (it.published || '').slice(0,10) || '');
+  const btn = opts.mode === "archived"
+    ? `<button class="pr-btn" data-arch-restore="${escapeHtml(it.id)}" title="복원">↩</button>`
+    : `<button class="pr-btn" data-cand-remove="${escapeHtml(it.id)}" title="후보 풀에서 제거">✕</button>`;
+  return `<div class="pool-row" style="border-left-color:${color}" data-pool-id="${escapeHtml(it.id)}">
+    <span class="pr-title" title="${escapeHtml(title)}">${escapeHtml(title)}</span>
+    <span class="pr-date">${escapeHtml(date)}</span>
+    ${btn}
+  </div>`;
+}
+
+function bindPoolRows(container, list, opts) {
+  container.querySelectorAll('.pool-row').forEach(row => {
+    const id = row.dataset.poolId;
+    const item = list.find(x => x.id === id);
+    if (!item) return;
+    row.addEventListener('click', (e) => {
+      // 버튼 클릭은 점프 막기
+      if (e.target.closest('.pr-btn')) return;
+      jumpToPoolItem(item);
+    });
+  });
+  container.querySelectorAll('[data-cand-remove]').forEach(b => {
+    b.addEventListener('click', (e) => { e.stopPropagation(); callItemAction("unpromote", b.dataset.candRemove); });
+  });
+  container.querySelectorAll('[data-arch-restore]').forEach(b => {
+    b.addEventListener('click', (e) => { e.stopPropagation(); callItemAction("unarchive", b.dataset.archRestore); });
+  });
+}
+
+function poolItemHtml(it, opts) {
+  const isYt = it.kind === "youtube";
+  const tag = isYt ? '📺' : '📰';
+  const front = escapeHtml(it.front_name || '');
+  const color = it.front_color || '#666';
+  const score = isYt
+    ? (it.opportunity_tier ? `<span class="opp-badge ${it.opportunity_tier}" style="font-size:9px;padding:2px 6px">${escapeHtml(it.opportunity_tier)}</span>` : '')
+    : `<span style="font-size:11px;color:var(--accent);font-weight:700">점수 ${(it.total ?? 0).toFixed(1)}</span>`;
+  const when = escapeHtml((it.promoted_at || it.archived_at || it.published || '').slice(0,10));
+
+  let body = '';
+  if (isYt) {
+    const sv = it.suggested_video || {};
+    const hot = (it.hot_topics || []).slice(0,4).map(h => `<span style="display:inline-block;background:${color}22;border:1px solid ${color}66;color:${color};padding:2px 8px;border-radius:999px;font-size:10px;margin-right:4px">${escapeHtml(h)}</span>`).join('');
+    const miss = (it.missing_angles || []).slice(0,3).map(x => `<li>${escapeHtml(x)}</li>`).join('');
+    body = `
+      ${sv.hook ? `<div style="background:rgba(94,234,212,0.08);border-left:3px solid var(--accent);padding:8px 10px;border-radius:4px;margin:6px 0">
+        <div style="font-size:13px;font-weight:600">${escapeHtml(sv.hook)}</div>
+        ${sv.title ? `<div style="font-size:11px;color:var(--fg-dim);margin-top:3px">${escapeHtml(sv.title)}</div>` : ''}
+        ${sv.why_gap ? `<div style="font-size:10px;color:var(--fg-dim);margin-top:4px;padding-top:4px;border-top:1px dashed var(--border)">${escapeHtml(sv.why_gap)}</div>` : ''}
+      </div>` : ''}
+      ${hot ? `<div style="margin:6px 0">${hot}</div>` : ''}
+      ${miss ? `<div style="font-size:10px;color:var(--warn);text-transform:uppercase;letter-spacing:0.06em;margin-top:6px">빠진 각도</div><ul style="margin:2px 0 0 16px;padding:0;font-size:11px;line-height:1.5">${miss}</ul>` : ''}
+    `;
+  } else {
+    const copy = it.copy || {};
+    const angles = (copy.daily_angles || []).slice(0,3).map(a => `<li>${escapeHtml(a)}</li>`).join('');
+    const titles = (copy.title_candidates || []).slice(0,3).map(t => `<li>${escapeHtml(t)}</li>`).join('');
+    body = `
+      <div style="font-size:13px;font-weight:600;margin:4px 0">${escapeHtml(it.one_line_summary || it.title || '')}</div>
+      <div style="font-size:11px;color:var(--fg-dim);margin-bottom:4px">${escapeHtml(it.title || '')}</div>
+      ${copy.hook_one_liner ? `<div style="background:rgba(94,234,212,0.08);border-left:3px solid var(--accent);padding:6px 10px;border-radius:4px;margin:6px 0;font-size:12px;font-weight:600">🎣 ${escapeHtml(copy.hook_one_liner)}</div>` : ''}
+      ${angles ? `<div style="font-size:10px;color:var(--fg-dim);text-transform:uppercase;letter-spacing:0.06em;margin-top:6px">📐 일상 각도</div><ul style="margin:2px 0 0 16px;padding:0;font-size:11px;line-height:1.5">${angles}</ul>` : ''}
+      ${titles ? `<div style="font-size:10px;color:var(--fg-dim);text-transform:uppercase;letter-spacing:0.06em;margin-top:6px">🎯 제목 후보</div><ul style="margin:2px 0 0 16px;padding:0;font-size:11px;line-height:1.5">${titles}</ul>` : ''}
+      ${it.link ? `<div style="margin-top:6px"><a href="${escapeHtml(it.link)}" target="_blank" style="font-size:11px">🔗 원문 열기</a> <span style="color:var(--fg-dim);font-size:10px">· ${escapeHtml(it.source || '')}</span></div>` : ''}
+    `;
+  }
+
+  const actionBtn = opts && opts.mode === "archived"
+    ? `<button data-arch-restore="${escapeHtml(it.id)}">↩ 복원</button>`
+    : `<button data-cand-archive="${escapeHtml(it.id)}">🚫 제외</button>`;
+
+  return `<div style="border:1px solid var(--border);border-left:3px solid ${color};border-radius:6px;padding:10px 12px;background:var(--bg-3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0">
+        <span>${tag}</span>
+        <span style="font-size:11px;color:${color};font-weight:600">${front}</span>
+        ${score}
+        <span style="font-size:9px;color:var(--fg-dim)">${when}</span>
+      </div>
+      ${actionBtn}
+    </div>
+    ${body}
+  </div>`;
+}
+
+function fillPoolColumn(listEl, countEl, items, opts) {
+  if (countEl) countEl.textContent = items.length;
+  if (!items.length) {
+    listEl.innerHTML = '<div class="pool-empty">비어 있음</div>';
+    return;
+  }
+  listEl.innerHTML = items.map(it => poolRowHtml(it, opts)).join("");
+  bindPoolRows(listEl, items, opts);
+}
+
+let _candList = []; // 후보 풀 전체 데이터 (v2)
+
+async function loadCandidatesPreview() {
+  try {
+    const r = await fetch(`data/${CURRENT_CHANNEL}/candidates.json?t=` + Date.now());
+    const list = await r.json();
+    _candList = list;
+    CANDIDATE_IDS = new Set(list.map(x => x.id));
+    const btn = document.getElementById("btn-show-candidates");
+    if (btn) btn.textContent = `⭐ 후보 풀 (${list.length})`;
+    renderCandListV2(list);
+    // 카드 표시 갱신
+    if (DAILY) render();
+    if (YT_DATA) renderYt(YT_DATA);
+  } catch (e) {}
+}
+
+function _fmtViews(n) {
+  if (!n) return "0";
+  if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '') + "만";
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + "천";
+  return String(n);
+}
+function _fmtDur(sec) {
+  if (!sec) return "";
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return m + ":" + String(s).padStart(2, "0");
+}
+
+function renderCandListV2(list) {
+  const container = document.getElementById("candListV2");
+  if (!container) return;
+  if (!list.length) {
+    container.innerHTML = '<div class="pool-empty" style="padding:24px;text-align:center">후보 풀이 비어 있습니다. RSS/YouTube 카드에서 ⭐ 버튼으로 추가하세요.</div>';
+    return;
+  }
+  container.innerHTML = list.map((it, idx) => {
+    const color = it.front_color || '#666';
+    const title = it.one_line_summary || it.title || it.front_name || '';
+    const date = (it.source_date || it.promoted_at || '').slice(0, 10);
+    const matched = it.matched_videos || [];
+    const refs = it.selected_refs || [];
+    const refCount = refs.length;
+    const badgeCls = refCount >= 2 ? 'ready' : refCount > 0 ? 'partial' : 'empty';
+    const badgeText = refCount >= 2 ? `✓ 레퍼런스 ${refCount}개` : matched.length > 0 ? `영상 ${matched.length}개` : '검색 전';
+    const isYt = it.kind === "youtube";
+    const tag = isYt ? '📺' : '📰';
+    const score = isYt ? '' : `<span style="font-size:11px;color:var(--accent);font-weight:700">${(it.total ?? 0).toFixed(1)}</span>`;
+
+    // body: info + videos
+    const copy = it.copy || {};
+    const hookLine = copy.hook_one_liner || (it.suggested_video?.hook) || '';
+    const origTitle = it.title || '';
+    const source = it.source || '';
+
+    return `<div class="cand-card" data-cand-idx="${idx}">
+      <div class="cand-header">
+        <span>${tag}</span>
+        <span class="cand-front" style="background:${color}22;color:${color};border:1px solid ${color}66">${escapeHtml(it.front_name || '')}</span>
+        ${score}
+        <span class="cand-title" title="${escapeHtml(origTitle)}">${escapeHtml(title)}</span>
+        <div class="cand-meta">
+          <span class="cand-refs-badge ${badgeCls}">${badgeText}</span>
+          <span class="cand-date">${escapeHtml(date)}</span>
+        </div>
+      </div>
+      <div class="cand-body">
+        <div class="cand-info">
+          ${origTitle !== title ? `<div style="color:var(--fg-dim);font-size:11px;margin-bottom:4px">${escapeHtml(origTitle)}</div>` : ''}
+          ${hookLine ? `<div class="hook">🎣 ${escapeHtml(hookLine)}</div>` : ''}
+          ${source ? `<span style="font-size:10px;color:var(--fg-dim)">출처: ${escapeHtml(source)}</span>` : ''}
+          ${it.link ? ` <a href="${escapeHtml(it.link)}" target="_blank" style="font-size:10px">원문 ↗</a>` : ''}
+        </div>
+        <div class="cand-actions">
+          <button class="primary" data-cand-search="${idx}">🔍 영상 검색</button>
+          <button data-cand-save-refs="${idx}" ${refCount < 1 ? 'disabled' : ''}>💾 레퍼런스 저장 (${refCount}개)</button>
+          ${refCount > 0 ? `<button data-cand-clear-refs="${idx}">↩ 레퍼런스 초기화</button>` : ''}
+          ${refCount >= 2 && !it.project_name ? `<button class="primary" data-cand-start="${idx}" style="background:#eaff00;color:#1a1a00;border-color:#eaff00">📝 대본 시작</button>` : ''}
+          ${it.project_name ? `<span style="font-size:11px;color:var(--accent);font-weight:600">✓ ${escapeHtml(it.project_name)}</span>` : ''}
+          <button data-cand-remove="${idx}" style="margin-left:auto;color:var(--danger)">🗑 후보에서 제거</button>
+        </div>
+        <div class="vid-grid" id="vidGrid-${idx}">
+          ${matched.length ? matched.map((v, vi) => _vidRowHtml(v, vi, refs)).join('') : '<div class="vid-empty">🔍 영상 검색 버튼을 눌러 관련 영상을 찾아보세요</div>'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 이벤트 바인딩
+  container.querySelectorAll('.cand-header').forEach(h => {
+    h.addEventListener('click', () => {
+      h.closest('.cand-card').classList.toggle('open');
+    });
+  });
+  container.querySelectorAll('[data-cand-search]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.candSearch);
+      searchVideosForCand(idx);
+    });
+  });
+  container.querySelectorAll('[data-cand-save-refs]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.candSaveRefs);
+      saveRefsForCand(idx);
+    });
+  });
+  container.querySelectorAll('[data-cand-remove]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.candRemove);
+      const it = _candList[idx];
+      if (it) callItemAction("unpromote", it.id);
+    });
+  });
+  container.querySelectorAll('[data-cand-clear-refs]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.candClearRefs);
+      const it = _candList[idx];
+      if (!it) return;
+      // 빈 배열로 저장 = 초기화
+      try {
+        await fetch(`${BACKEND}/api/cand-save-refs`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({id: it.id, video_ids: [], channel: CURRENT_CHANNEL}),
+        });
+        showToast("레퍼런스 초기화됨");
+        await loadCandidatesPreview();
+        const card = document.querySelector(`.cand-card[data-cand-idx="${idx}"]`);
+        if (card) card.classList.add('open');
+      } catch (e) { showToast("실패"); }
+    });
+  });
+  container.querySelectorAll('[data-cand-start]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.candStart);
+      const it = _candList[idx];
+      if (!it) return;
+      btn.disabled = true;
+      btn.textContent = '⏳ 프로젝트 생성 중...';
+      try {
+        const r = await fetch(`${BACKEND}/api/cand-start`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({id: it.id, channel: CURRENT_CHANNEL}),
+        });
+        const j = await r.json();
+        if (r.ok && j.ok !== false) {
+          showToast("프로젝트 생성 완료! script-pd로 이어서 진행하세요.");
+          await loadCandidatesPreview();
+          const card = document.querySelector(`.cand-card[data-cand-idx="${idx}"]`);
+          if (card) card.classList.add('open');
+        } else {
+          showToast("프로젝트 생성 실패: " + (j.error || j.stderr || '').slice(0, 100));
+          btn.disabled = false;
+          btn.textContent = '📝 대본 시작';
+        }
+      } catch (e) {
+        showToast("백엔드 연결 실패");
+        btn.disabled = false;
+        btn.textContent = '📝 대본 시작';
+      }
+    });
+  });
+  // 비디오 행 체크박스
+  _bindVidCheckboxes(container);
+}
+
+function _vidRowHtml(v, vi, selectedRefs) {
+  const checked = (selectedRefs || []).includes(v.video_id) ? 'checked' : '';
+  return `<div class="vid-row ${checked ? 'selected' : ''}" data-vid="${escapeHtml(v.video_id)}">
+    <input type="checkbox" data-vid-check="${escapeHtml(v.video_id)}" ${checked}>
+    <img class="vid-thumb" src="${escapeHtml(v.thumbnail || '')}" alt="" loading="lazy" onerror="this.style.display='none'">
+    <div class="vid-info">
+      <div class="vid-title" title="${escapeHtml(v.title || '')}">${escapeHtml(v.title || '')}</div>
+      <div class="vid-ch">${escapeHtml(v.channel_title || '')} · ${escapeHtml((v.published_at || '').slice(0,10))}</div>
+    </div>
+    <span class="vid-views">${_fmtViews(v.view_count)}</span>
+    <span class="vid-dur">${_fmtDur(v.duration_sec)}</span>
+  </div>`;
+}
+
+function _bindVidCheckboxes(container) {
+  container.querySelectorAll('.vid-row').forEach(row => {
+    const cb = row.querySelector('input[type=checkbox]');
+    if (!cb) return;
+    // 행 클릭 시 체크박스 토글 (YouTube 링크 열기는 제목 더블클릭으로)
+    row.addEventListener('click', (e) => {
+      if (e.target === cb) return; // 체크박스 직접 클릭은 패스
+      cb.checked = !cb.checked;
+      cb.dispatchEvent(new Event('change', {bubbles: true}));
+    });
+    // 더블클릭으로 YouTube 열기
+    row.addEventListener('dblclick', () => {
+      const vid = row.dataset.vid;
+      if (vid) window.open(`https://www.youtube.com/watch?v=${vid}`, '_blank');
+    });
+    cb.addEventListener('change', () => {
+      row.classList.toggle('selected', cb.checked);
+      // 저장 버튼 카운트 업데이트
+      const card = row.closest('.cand-card');
+      if (!card) return;
+      const idx = parseInt(card.dataset.candIdx);
+      const count = card.querySelectorAll('.vid-row input[type=checkbox]:checked').length;
+      const saveBtn = card.querySelector('[data-cand-save-refs]');
+      if (saveBtn) {
+        saveBtn.textContent = `💾 레퍼런스 저장 (${count}개)`;
+        saveBtn.disabled = count < 1;
+      }
+    });
+  });
+}
+
+async function searchVideosForCand(idx) {
+  const it = _candList[idx];
+  if (!it) return;
+  const grid = document.getElementById(`vidGrid-${idx}`);
+  if (!grid) return;
+  grid.innerHTML = '<div class="vid-searching">🔍 YouTube 검색 중...</div>';
+
+  try {
+    const r = await fetch(`${BACKEND}/api/cand-search`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({id: it.id, channel: CURRENT_CHANNEL, days: 30, max_results: 15}),
+    });
+    const j = await r.json();
+    if (!r.ok || j.ok === false) {
+      grid.innerHTML = `<div class="vid-empty">검색 실패: ${escapeHtml(j.error || j.stderr || '')}</div>`;
+      return;
+    }
+    // candidates.json이 업데이트됨 → 다시 로드
+    await loadCandidatesPreview();
+    // 해당 카드 자동으로 열기
+    const card = document.querySelector(`.cand-card[data-cand-idx="${idx}"]`);
+    if (card) card.classList.add('open');
+    showToast(`${(it.matched_videos || []).length || '?'}건 검색 완료`);
+  } catch (e) {
+    grid.innerHTML = '<div class="vid-empty">백엔드 연결 실패</div>';
+  }
+}
+
+async function saveRefsForCand(idx) {
+  const it = _candList[idx];
+  if (!it) return;
+  const card = document.querySelector(`.cand-card[data-cand-idx="${idx}"]`);
+  if (!card) return;
+  const checked = [...card.querySelectorAll('.vid-row input[type=checkbox]:checked')];
+  const videoIds = checked.map(cb => cb.dataset.vidCheck).filter(Boolean);
+  if (!videoIds.length) return;
+
+  try {
+    const r = await fetch(`${BACKEND}/api/cand-save-refs`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({id: it.id, video_ids: videoIds, channel: CURRENT_CHANNEL}),
+    });
+    const j = await r.json();
+    if (r.ok && j.ok !== false) {
+      showToast(`${videoIds.length}개 레퍼런스 저장됨`);
+      await loadCandidatesPreview();
+      const newCard = document.querySelector(`.cand-card[data-cand-idx="${idx}"]`);
+      if (newCard) newCard.classList.add('open');
+    } else {
+      showToast("저장 실패: " + (j.error || j.stderr || ''));
+    }
+  } catch (e) {
+    showToast("백엔드 연결 실패");
+  }
+}
+
+async function loadArchivedPreview() {
+  try {
+    const r = await fetch(`data/${CURRENT_CHANNEL}/archived.json?t=` + Date.now());
+    const list = r.ok ? await r.json() : [];
+    ARCHIVED_IDS = new Set(list.map(x => x.id));
+    const btn = document.getElementById("btn-show-archived");
+    if (btn) btn.textContent = `🚫 제외 풀 (${list.length})`;
+    const rss = list.filter(x => x.kind !== "youtube");
+    const yt = list.filter(x => x.kind === "youtube");
+    fillPoolColumn(document.getElementById("archListRss"), document.getElementById("archRssCount"), rss, {mode: "archived"});
+    fillPoolColumn(document.getElementById("archListYt"), document.getElementById("archYtCount"), yt, {mode: "archived"});
+    if (DAILY) render();
+    if (YT_DATA) renderYt(YT_DATA);
+  } catch (e) {}
+}
+
+// promote/archive 응답을 받아 통일된 토스트를 띄우는 헬퍼
+async function callItemAction(action, id) {
+  try {
+    const r = await fetch(`${BACKEND}/api/${action}`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({id, channel: CURRENT_CHANNEL}),
+    });
+    const j = await r.json();
+    if (r.ok && j.ok !== false) {
+      const msgs = {promote: "후보 풀에 추가됨", archive: "제외 풀로 이동됨", unarchive: "복원됨", unpromote: "후보 풀에서 제거됨"};
+      showToast(msgs[action] || (action + " 완료"));
+      loadCandidatesPreview();
+      loadArchivedPreview();
+      return true;
+    }
+    showToast(`${action} 실패: ${j.error || j.stderr || r.status}`);
+  } catch (e) {
+    showToast("백엔드 미실행 - server.py를 켜세요");
+  }
+  return false;
+}
+
+function buildFrontChips() {
+  const wrap = document.getElementById("frontChips");
+  // 기본: 전부 활성. 클릭하면 제외(active 해제) 토글.
+  SELECTED_FRONTS = new Set((CONFIG.fronts || []).map(f => f.id));
+  wrap.innerHTML = (CONFIG.fronts || []).map(f => `
+    <span class="chip active" data-front="${f.id}">
+      <span class="dot" style="background:${f.color}"></span>${f.name}
+    </span>
+  `).join("");
+  wrap.querySelectorAll(".chip").forEach(c => {
+    c.addEventListener("click", () => {
+      const id = c.dataset.front;
+      if (SELECTED_FRONTS.has(id)) SELECTED_FRONTS.delete(id);
+      else SELECTED_FRONTS.add(id);
+      c.classList.toggle("active");
+      render();
+      if (YT_DATA) renderYt(YT_DATA);
+    });
+  });
+}
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+}
+
+function render() {
+  if (!DAILY) return;
+  let items = (DAILY.items || []).filter(it => (it.total ?? 0) >= THRESHOLD);
+  // CTR 필터: ctr_score.normalized 있는 항목만 기준 적용. copy 미생성(=값 없음) 항목은 통과.
+  items = items.filter(it => {
+    const n = it.copy?.ctr_score?.normalized;
+    return (n === undefined || n === null) ? true : n >= CTR_THRESHOLD;
+  });
+  items = items.filter(it => SELECTED_FRONTS.has(it.front_id));
+  // 제외 풀에 있는 항목은 숨김
+  items = items.filter(it => !ARCHIVED_IDS.has(it.id));
+  if (SORT_BY === "total") items.sort((a, b) => (b.total ?? 0) - (a.total ?? 0));
+  else if (SORT_BY === "ctr") items.sort((a, b) => (b.copy?.ctr_score?.normalized ?? -1) - (a.copy?.ctr_score?.normalized ?? -1));
+  else items.sort((a, b) => (b.scores?.[SORT_BY] ?? 0) - (a.scores?.[SORT_BY] ?? 0));
+
+  const grid = document.getElementById("grid");
+  document.getElementById("empty").style.display = items.length ? "none" : "block";
+  grid.innerHTML = items.map((it, idx) => cardHtml(it, idx)).join("");
+  buildToc(items);
+  setupScrollSpy(grid.parentElement, "#grid .card", "#toc-rss .toc-item");
+
+  grid.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      await callItemAction(action, id);
+    });
+  });
+}
+
+function cardHtml(it, idx) {
+  const cand = THRESHOLD;
+  const cls = (it.total >= cand) ? "" : ((it.total >= cand - 3) ? "watch" : "low");
+  const copy = it.copy || {};
+  const scores = it.scores || {};
+  const angles = (copy.daily_angles || []).slice(0, 3);
+  const titles = (copy.title_candidates || []).slice(0, 3);
+  const ctr = copy.ctr_score || null;
+  const ctrAxesScores = copy.ctr_axes || {};
+  const ctrBadge = ctr
+    ? `<div class="ctr-badge ${ctr.tier || 'weak'}"><span class="lbl">CTR</span>${Math.round(ctr.normalized ?? 0)} / 100</div>`
+    : "";
+  const ctrAxesHtml = ctr
+    ? `<div class="section-label">CTR 8축</div><div class="ctr-axes">${CTR_AXES.map(a => {
+        const v = Number(ctrAxesScores[a.id] ?? 0);
+        const isPen = (a.weight || 0) < 0;
+        const h = Math.max(0, Math.min(5, v)) * 20;
+        const short = shortCtrName(a.name);
+        return `<div class="ctr-ax ${isPen ? 'penalty' : ''}">
+          <div class="bar"><div class="fill" style="height:${h}%"></div></div>
+          <div class="val">${v}</div>
+          <div class="lbl">${escapeHtml(short)}</div>
+          <div class="tip"><strong>${escapeHtml(a.name)}</strong> (${v}/5)<br>${escapeHtml(a.guide || '')}</div>
+        </div>`;
+      }).join("")}</div>`
+    : "";
+  const frontDef = (CONFIG.fronts || []).find(f => f.id === it.front_id) || {};
+  const frontName = frontDef.name || it.front_name || "미분류";
+  const frontColor = frontDef.color || it.front_color || "#888";
+  const inPool = CANDIDATE_IDS.has(it.id);
+  return `
+    <div class="card${inPool ? ' in-pool' : ''}" id="card-${idx}" data-card-idx="${idx}">
+      <div class="top" style="align-items:center">
+        <span class="badge" style="background:${frontColor}">${escapeHtml(frontName)}</span>
+        <div style="flex:1"></div>
+        <span class="total ${cls}" style="font-size:14px" title="자동 점수(8축 합산). 임계 ${THRESHOLD} 이상이면 자체 분류상 '후보' 등급"><span style="font-size:10px;color:var(--fg-dim);font-weight:400">점수</span> ${(it.total ?? 0).toFixed(1)}</span>
+        ${ctrBadge}
+      </div>
+      <div class="summary">${escapeHtml(it.one_line_summary || it.title)}</div>
+      <div class="title-orig">${escapeHtml(it.title)}</div>
+      <div class="scores">
+        ${AXES.map(a => `
+          <div class="score" title="${escapeHtml(a.name)}">
+            <div>${a.name}</div>
+            <div><b>${scores[a.id] ?? "-"}</b><span style="opacity:0.5">/5</span></div>
+            <div class="bar"><div class="fill" style="width:${(scores[a.id] ?? 0) * 20}%"></div></div>
+          </div>
+        `).join("")}
+      </div>
+      ${ctrAxesHtml}
+      ${copy.hook_one_liner ? `<div class="plan-card hook" style="margin:6px 0">
+        <div class="plan-lbl">🎣 HOOK</div>
+        <div class="plan-hook">${escapeHtml(copy.hook_one_liner)}</div>
+      </div>` : ""}
+      ${(angles.length || titles.length) ? `<div class="plan-grid-2">
+        ${angles.length ? `<div class="plan-card">
+          <div class="plan-lbl">📐 일상 진입 각도</div>
+          <ul class="plan-list">${angles.map(a => `<li>${escapeHtml(a)}</li>`).join("")}</ul>
+        </div>` : "<div></div>"}
+        ${titles.length ? `<div class="plan-card">
+          <div class="plan-lbl">🎯 제목 후보</div>
+          <ul class="plan-list">${titles.map(t => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+        </div>` : "<div></div>"}
+      </div>` : ""}
+      ${copy.risk_note ? `<div class="risk">⚠ ${escapeHtml(copy.risk_note)}</div>` : ""}
+      <div class="meta">${escapeHtml(it.source || "")} · ${escapeHtml((it.published || "").slice(0, 10))}</div>
+      <div class="actions">
+        <button class="primary" data-action="promote" data-id="${it.id}" title="이 항목을 후보 풀(candidates.json)에 저장"${inPool ? ' disabled' : ''}>${inPool ? '✓ 후보 풀에 있음' : '⭐ 후보 풀에 추가'}</button>
+        <button data-action="archive" data-id="${it.id}" title="제외 풀로 이동(보관). 후보 풀에서도 빼며, 제외 풀에서 복원 가능">🚫 제외</button>
+        <button onclick="window.open('${it.link}','_blank')">원문 열기</button>
+      </div>
+    </div>
+  `;
+}
+
+function buildToc(items) {
+  const toc = document.getElementById("toc-rss");
+  if (!toc) return;
+  toc.innerHTML = `<div class="toc-header">📋 ${items.length}건</div>` + items.map((it, idx) => {
+    const ctr = it.copy?.ctr_score?.normalized;
+    const tier = it.copy?.ctr_score?.tier || 'weak';
+    const ctrBadge = ctr != null
+      ? `<div class="ctr-mini ${tier}">${Math.round(ctr)}</div>`
+      : `<div class="ctr-mini weak">-</div>`;
+    const front = (CONFIG?.fronts || []).find(f => f.id === it.front_id) || {};
+    const color = front.color || it.front_color || '#666';
+    const summary = it.one_line_summary || it.title || '';
+    return `<div class="toc-item" data-idx="${idx}">
+      ${ctrBadge}
+      <div class="front-bar" style="background:${color}"></div>
+      <div class="toc-text">${escapeHtml(summary.slice(0, 60))}<small>${escapeHtml(front.name || it.front_name || '')}</small></div>
+    </div>`;
+  }).join("");
+  toc.querySelectorAll('.toc-item').forEach(el => {
+    el.onclick = () => jumpToCard(el.dataset.idx, `card-${el.dataset.idx}`, "#toc-rss .toc-item");
+  });
+}
+
+let _scrollSpyHandler = null;
+let _scrollSpyContainer = null;
+let _scrollSpyPaused = false;
+function setupScrollSpy(container, cardSelector, tocSelector) {
+  if (!container) return;
+  // 이전 핸들러 제거
+  if (_scrollSpyContainer && _scrollSpyHandler) {
+    _scrollSpyContainer.removeEventListener('scroll', _scrollSpyHandler);
+  }
+  _scrollSpyContainer = container;
+  // 컨테이너 상단에서 100px 아래 지점을 기준선으로 잡음 (메인에 자리 잡은 카드)
+  const ANCHOR_OFFSET = 100;
+  const updateActive = () => {
+    if (_scrollSpyPaused) return;
+    // 컨테이너가 숨겨져 있으면(탭 비활성) offsetTop이 의미 없어 잘못된 active를 만든다 — 스킵
+    if (container.offsetParent === null || container.clientHeight === 0) return;
+    const cards = container.querySelectorAll(cardSelector);
+    if (!cards.length) return;
+    const cTop = container.scrollTop;
+    const anchor = cTop + ANCHOR_OFFSET;
+    let activeIdx = null;
+    // anchor 이하 가장 마지막 카드 = 현재 메인 카드
+    for (const card of cards) {
+      const cardTop = card.offsetTop - container.offsetTop;
+      if (cardTop <= anchor) {
+        activeIdx = card.dataset.cardIdx;
+      } else {
+        break;
+      }
+    }
+    // 첫 카드가 아직 anchor 아래면 첫 카드 강제
+    if (activeIdx == null && cards.length) {
+      activeIdx = cards[0].dataset.cardIdx;
+    }
+    if (activeIdx != null) {
+      document.querySelectorAll(tocSelector).forEach(t => {
+        t.classList.toggle('active', t.dataset.idx === String(activeIdx));
+      });
+    }
+  };
+  // throttle (rAF)
+  let ticking = false;
+  _scrollSpyHandler = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { updateActive(); ticking = false; });
+  };
+  container.addEventListener('scroll', _scrollSpyHandler, {passive: true});
+  // 초기 1회
+  updateActive();
+}
+
+// 클릭 점프 시 스파이를 잠시 멈추고 active를 강제 고정
+function jumpToCard(idx, cardId, tocSelector) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  _scrollSpyPaused = true;
+  // active 강제 적용
+  document.querySelectorAll(tocSelector).forEach(t => {
+    t.classList.toggle('active', t.dataset.idx === String(idx));
+  });
+  const container = card.closest('.cards-area');
+  if (container) {
+    const cTop = card.offsetTop - container.offsetTop;
+    container.scrollTo({top: Math.max(0, cTop - 12), behavior: 'smooth'});
+  } else {
+    card.scrollIntoView({behavior: 'smooth', block: 'start'});
+  }
+  card.classList.add('flash');
+  setTimeout(() => card.classList.remove('flash'), 1200);
+  // smooth scroll(약 600~900ms) 끝나고 약간 여유 후 스파이 재개
+  setTimeout(() => { _scrollSpyPaused = false; }, 1200);
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2500);
+}
+
+document.getElementById("dateSel").addEventListener("change", e => loadDaily(e.target.value));
+document.getElementById("thSlider").addEventListener("input", e => {
+  THRESHOLD = parseFloat(e.target.value);
+  document.getElementById("thVal").textContent = THRESHOLD;
+  render();
+});
+document.getElementById("ctrSlider").addEventListener("input", e => {
+  CTR_THRESHOLD = parseFloat(e.target.value);
+  document.getElementById("ctrVal").textContent = CTR_THRESHOLD;
+  render();
+});
+document.getElementById("sortSel").addEventListener("change", e => { SORT_BY = e.target.value; render(); });
+document.getElementById("ytSortSel").addEventListener("change", e => {
+  YT_SORT = e.target.value;
+  if (YT_DATA) renderYt(YT_DATA);
+});
+document.getElementById("ytDemSlider").addEventListener("input", e => {
+  YT_DEM_MIN = parseInt(e.target.value);
+  document.getElementById("ytDemVal").textContent = YT_DEM_MIN;
+  if (YT_DATA) renderYt(YT_DATA);
+});
+document.getElementById("ytCmpSlider").addEventListener("input", e => {
+  YT_CMP_MAX = parseInt(e.target.value);
+  document.getElementById("ytCmpVal").textContent = YT_CMP_MAX;
+  if (YT_DATA) renderYt(YT_DATA);
+});
+function updateOppDot() {
+  const tier = OPP_ORDER[YT_OPP_MIN - 1] || "red";
+  const dot = document.getElementById("ytOppDot");
+  dot.style.background = OPP_COLORS[tier];
+  dot.style.color = OPP_COLORS[tier];
+  dot.title = OPP_KO[tier] + " 까지 표시";
+}
+document.getElementById("ytOppSlider").addEventListener("input", e => {
+  YT_OPP_MIN = parseInt(e.target.value);
+  updateOppDot();
+  if (YT_DATA) renderYt(YT_DATA);
+});
+updateOppDot();
+
+function setRunStatus(msg) {
+  const el = document.getElementById("run-status");
+  if (el) el.textContent = msg || "";
+}
+
+// 채널별 실행 상태 관리: { channel: { btnId, pct, pollTimer, dryRun } }
+const _runStates = {};
+let _activeBtn = null;
+
+// 서버에서 해당 채널의 실행 상태를 확인하고, 실행 중이면 _runStates 등록 + 폴링 시작
+// 실행 중이 아니면 마지막 실행 요약을 "상태" 자리에 표시
+async function _recoverRunState(ch) {
+  // 이미 프론트에서 추적 중이면 스킵
+  if (_runStates[ch]) return;
+  try {
+    const sep = BACKEND.includes("?") ? "&" : "?";
+    const r = await fetch(BACKEND + "/api/status" + sep + "channel=" + encodeURIComponent(ch));
+    const s = await r.json();
+    if (s.running) {
+      const btnId = "btn-run";
+      _runStates[ch] = { btnId, pct: 1, dryRun: !!s.dry_run, statusMsg: s.stage || "실행 중…" };
+      startPolling(ch);
+    } else if (ch === CURRENT_CHANNEL) {
+      // 실행 중이 아니면 마지막 실행 요약 표시
+      const summary = _formatLastRunSummary(s);
+      if (summary) setRunStatus(summary);
+    }
+  } catch (e) { /* 백엔드 미실행 시 무시 */ }
+}
+
+// /api/status 응답에서 마지막 실행 요약 문자열 생성
+function _formatLastRunSummary(s) {
+  if (!s) return "";
+  const parts = [];
+  // s.cmd는 풀 명령줄이라 서브커맨드(run/ytrun)만 추출
+  const cmdStr = typeof s.cmd === "string" ? s.cmd : "";
+  const tag = /radar\.py\s+ytrun/.test(cmdStr) ? "ytrun" : "run";
+  if (s.stage && s.stage !== "idle") parts.push(`${tag} ${s.stage}`);
+  if (s.duration_sec != null) parts.push(`${Math.round(s.duration_sec)}s`);
+  if (s.hours_since_last != null) parts.push(`${s.hours_since_last}h 전`);
+  else if (s.last_run_at) parts.push("완료");
+  return parts.length ? parts.join(" · ") : "";
+}
+
+function setBtnProgress(btn, pct) {
+  if (!btn) return;
+  btn.classList.add("running");
+  const pb = btn.querySelector(".pbar");
+  const pt = btn.querySelector(".pct");
+  if (pb) pb.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+  if (pt) pt.textContent = `${Math.round(pct)}%`;
+}
+function clearBtnProgress(btn) {
+  if (!btn) return;
+  btn.classList.remove("running");
+  const pb = btn.querySelector(".pbar");
+  const pt = btn.querySelector(".pct");
+  if (pb) pb.style.width = "0%";
+  if (pt) pt.textContent = "";
+}
+
+// 현재 채널의 실행 상태가 있으면 버튼에 프로그래스바 복원, 없으면 클리어
+function syncBtnProgressToChannel() {
+  const st = _runStates[CURRENT_CHANNEL];
+  const btnRun = document.getElementById("btn-run");
+  const btnDry = document.getElementById("btn-dry");
+  if (st) {
+    const btn = st.btnId === "btn-dry" ? btnDry : btnRun;
+    const other = st.btnId === "btn-dry" ? btnRun : btnDry;
+    _activeBtn = btn;
+    setBtnProgress(btn, st.pct || 0);
+    clearBtnProgress(other);
+    setRunStatus(st.statusMsg || "실행 중…");
+  } else {
+    _activeBtn = null;
+    clearBtnProgress(btnRun);
+    clearBtnProgress(btnDry);
+    // 실행 중 아닐 때는 상태 자리를 비우지 않음 — _recoverRunState가 마지막 실행 요약으로 채움
+  }
+}
+
+async function triggerRun(dryRun, endpoint) {
+  endpoint = endpoint || "/api/run";
+  const ch = CURRENT_CHANNEL;
+  // 이전 실행의 좀비 상태가 남아있으면 정리 (서버 상태가 진실이므로 일단 클리어하고 서버 응답으로 판정)
+  if (_runStates[ch]) {
+    if (_runStates[ch].pollTimer) clearInterval(_runStates[ch].pollTimer);
+    delete _runStates[ch];
+  }
+  const btnId = dryRun ? "btn-dry" : "btn-run";
+  _activeBtn = document.getElementById(btnId);
+  // 채널별 상태 등록
+  _runStates[ch] = { btnId, pct: 1, dryRun, statusMsg: "시작 중…" };
+  setBtnProgress(_activeBtn, 1);
+  setRunStatus("시작 중…");
+  try {
+    const r = await fetch(BACKEND + endpoint, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ dry_run: !!dryRun, channel: ch }),
+    });
+    if (r.status === 409) {
+      // 이미 실행 중 → 기존 실행에 폴링 연결
+      _runStates[ch] = { btnId, pct: 1, dryRun, statusMsg: "실행 중…" };
+      setBtnProgress(_activeBtn, 1);
+      setRunStatus("실행 중… (기존 작업에 연결)");
+      startPolling(ch);
+      return;
+    } else if (!r.ok) {
+      const j = await r.json().catch(() => ({}));
+      setRunStatus("실행 실패: " + (j.error || r.status));
+      clearBtnProgress(_activeBtn);
+      _activeBtn = null;
+      delete _runStates[ch];
+      return;
+    }
+    startPolling(ch);
+  } catch (e) {
+    setRunStatus("백엔드 미실행 - server.py를 켜세요");
+    clearBtnProgress(_activeBtn);
+    _activeBtn = null;
+    delete _runStates[ch];
+  }
+}
+
+function parseStageFromLog(logTail) {
+  // 로그 마지막 라인들에서 stage별 카운트 추출
+  const lines = (logTail || []).join("\n");
+  const out = {};
+  const m1 = lines.match(/\[yt\] 트렌딩[^:]*:\s*(\d+)/);
+  if (m1) out.trending = m1[1];
+  const m2 = lines.match(/\[yt\] 검색 합계:\s*(\d+)/);
+  if (m2) out.search = m2[1];
+  const m3 = lines.match(/\[yt\] 중복 제거 후:\s*(\d+)/);
+  if (m3) out.dedup = m3[1];
+  const m4 = lines.match(/\[collect\][^→]*→.*\n?.*?(\d+)건/);
+  if (m4) out.collect = m4[1];
+  const m5 = lines.match(/\[filter\]\s*(\d+)\s*→\s*(\d+).*?→\s*(\d+)/);
+  if (m5) { out.rawCount = m5[1]; out.filtered = m5[3]; }
+  const m6 = lines.match(/\[analyze\]\s*후보\s*(\d+)건/);
+  if (m6) out.candidates = m6[1];
+  const m7 = lines.match(/\[ytrun\][^→]*→/);
+  if (m7) out.ytdone = true;
+  const mDry = lines.match(/\[dry-run\]([^\n]*)/);
+  if (mDry) out.dryNote = mDry[1].trim();
+  return out;
+}
+
+function showRunSummary(s) {
+  const parsed = parseStageFromLog(s.log_tail);
+  const dur = Math.round(s.duration_sec || 0);
+  const isDry = !!s.dry_run;
+  const ok = s.exit_code === 0;
+  const tag = isDry ? "🔍 Dry-run 완료" : (ok ? "✅ 분석 완료" : `⚠️ 종료(code=${s.exit_code})`);
+
+  // 요약 박스 갱신
+  let box = document.getElementById("run-summary");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "run-summary";
+    box.style.cssText = "position:fixed;right:16px;bottom:16px;max-width:380px;background:var(--bg-2,#1a1a1a);border:1px solid var(--border,#333);border-radius:10px;padding:14px 16px;box-shadow:0 8px 30px rgba(0,0,0,0.5);z-index:500;font-size:12px;line-height:1.6;";
+    document.body.appendChild(box);
+  }
+  const lines = [];
+  lines.push(`<div style="font-size:14px;font-weight:700;margin-bottom:6px">${tag} <span style="float:right;font-weight:400;color:var(--fg-dim,#888)">${dur}s</span></div>`);
+  if (parsed.trending) lines.push(`📺 트렌딩: <b>${parsed.trending}</b>건`);
+  if (parsed.search) lines.push(`🔎 키워드 검색: <b>${parsed.search}</b>건`);
+  if (parsed.dedup) lines.push(`🧹 중복 제거 후: <b>${parsed.dedup}</b>건`);
+  if (parsed.rawCount) lines.push(`📰 RSS 수집: <b>${parsed.rawCount}</b>건`);
+  if (parsed.filtered) lines.push(`✂ 필터 후: <b>${parsed.filtered}</b>건`);
+  if (parsed.candidates) lines.push(`⭐ 카피 생성 후보: <b>${parsed.candidates}</b>건`);
+  if (parsed.dryNote) lines.push(`<div style="margin-top:6px;padding:6px 8px;background:rgba(234,255,0,0.08);border-left:2px solid #eaff00;color:var(--fg,#fff)">${parsed.dryNote}</div>`);
+  lines.push(`<div style="margin-top:8px;text-align:right"><button onclick="document.getElementById('run-summary').remove()" style="background:transparent;border:1px solid var(--border,#333);color:var(--fg-dim,#888);padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px">닫기</button></div>`);
+  box.innerHTML = lines.join("<br>");
+
+  setRunStatus(`${tag} · ${dur}s`);
+}
+
+// stage별 진행률 가중치 (cumulative)
+function estimateProgress(stage, parsed, isYt) {
+  // RSS: starting(0) → collect(15) → filter(25) → analyze(30~95) → done(100)
+  // YT:  starting(0) → trending(10) → search(40) → dedup(50) → analyze(50~95) → done(100)
+  if (isYt) {
+    if (stage === "starting") return 5;
+    if (parsed.trending && !parsed.search) return 15;
+    if (parsed.search && !parsed.dedup) return 40;
+    if (parsed.dedup && !parsed.ytdone) {
+      // analyze 진행: 분야 9개 중 몇 개 끝났는지 추정 (log_tail에서 [ytanalyze] 라인 수)
+      return 50;
+    }
+    return 90;
+  } else {
+    if (stage === "starting") return 5;
+    if (parsed.rawCount && !parsed.filtered) return 15;
+    if (parsed.filtered && !parsed.candidates) return 30;
+    if (parsed.candidates) return 50 + Math.min(45, parseInt(parsed.candidates) * 5);
+    return 30;
+  }
+}
+
+let _lastLogLines = 0;
+let _lastActivityAt = 0;
+function startPolling(ch) {
+  // 채널별 폴링: 기존 폴링이 있으면 유지 (다른 채널 폴링)
+  const st = _runStates[ch];
+  if (!st) return;
+  if (st.pollTimer) clearInterval(st.pollTimer);
+  _lastLogLines = 0;
+  _lastActivityAt = Date.now();
+  const tick = async () => {
+    try {
+      const sep = BACKEND.includes("?") ? "&" : "?";
+      const r = await fetch(BACKEND + "/api/status" + sep + "channel=" + encodeURIComponent(ch));
+      const s = await r.json();
+      if (s.running) {
+        const parsed = parseStageFromLog(s.log_tail);
+        const isYt = (s.cmd === "ytrun" || (s.log_tail||[]).some(l => l.includes("[yt]") || l.includes("[ytrun]") || l.includes("[ytanalyze]")));
+        const pct = estimateProgress(s.stage, parsed, isYt);
+        // 활동 감지 (라인 수 변화)
+        if (s.log_lines !== _lastLogLines) {
+          _lastLogLines = s.log_lines;
+          _lastActivityAt = Date.now();
+        }
+        const idle = Math.round((Date.now() - _lastActivityAt) / 1000);
+        const elapsed = s.started_at ? Math.round((Date.now() - new Date(s.started_at).getTime()) / 1000) : 0;
+        const elapsedStr = elapsed >= 60 ? `${Math.floor(elapsed/60)}m${(elapsed%60).toString().padStart(2,'0')}s` : `${elapsed}s`;
+        const counts = [];
+        if (parsed.trending) counts.push(`트렌딩 ${parsed.trending}`);
+        if (parsed.search) counts.push(`검색 ${parsed.search}`);
+        if (parsed.dedup) counts.push(`중복후 ${parsed.dedup}`);
+        if (parsed.rawCount) counts.push(`RSS ${parsed.rawCount}`);
+        if (parsed.filtered) counts.push(`필터 ${parsed.filtered}`);
+        if (parsed.candidates) counts.push(`후보 ${parsed.candidates}`);
+        const cnt = counts.length ? ` · ${counts.join(' / ')}` : '';
+        const idleNote = idle > 10 ? ` · 대기 ${idle}s` : '';
+        // 채널별 상태 저장 — 경과 시간을 맨 앞에 배치
+        st.pct = pct;
+        st.statusMsg = `${elapsedStr} ${s.stage}${idleNote}${cnt}`;
+        // 현재 보고 있는 채널이면 UI 갱신
+        if (ch === CURRENT_CHANNEL) {
+          const btn = document.getElementById(st.btnId);
+          _activeBtn = btn;
+          setBtnProgress(btn, pct);
+          setRunStatus(st.statusMsg);
+        }
+      } else {
+        clearInterval(st.pollTimer);
+        // 현재 보고 있는 채널이면 완료 UI 표시
+        if (ch === CURRENT_CHANNEL) {
+          const btn = document.getElementById(st.btnId);
+          setBtnProgress(btn, 100);
+          setTimeout(() => clearBtnProgress(btn), 1500);
+          _activeBtn = null;
+          showRunSummary(s);
+          setRunStatus("");
+        }
+        delete _runStates[ch];
+        loadWindowInfo();
+        loadYtWindowInfo();
+        // 결과 갱신 (dry-run이 아닐 때만 의미 있음)
+        if (!s.dry_run) {
+          if (ch === CURRENT_CHANNEL) {
+            const latestDate = await loadDateList();
+            if (latestDate) await loadDaily(latestDate);
+            loadCandidatesPreview();
+            await loadYtDates();
+          }
+          // 떡상 탭은 채널 무관 공용이라 항상 갱신
+          if (CURRENT_TAB === "breakout") await loadBreakout();
+        }
+      }
+    } catch (e) {
+      if (st.pollTimer) clearInterval(st.pollTimer);
+      if (ch === CURRENT_CHANNEL) {
+        const btn = document.getElementById(st.btnId);
+        clearBtnProgress(btn);
+        _activeBtn = null;
+        setRunStatus("백엔드 미실행 - server.py를 켜세요");
+      }
+      delete _runStates[ch];
+    }
+  };
+  tick();
+  st.pollTimer = setInterval(tick, 2500);
+}
+
+// 실행 버튼은 현재 탭에 따라 endpoint가 자동으로 바뀜 (RSS↔YouTube↔떡상 통합)
+function currentEndpoint() {
+  if (CURRENT_TAB === "youtube") return "/api/ytrun";
+  if (CURRENT_TAB === "breakout") return "/api/newsradar";
+  return "/api/run";
+}
+document.getElementById("btn-run").addEventListener("click", () => triggerRun(false, currentEndpoint()));
+document.getElementById("btn-dry").addEventListener("click", () => triggerRun(true, currentEndpoint()));
+
+// === 탭 전환 + YouTube 뷰 ===
+let CURRENT_TAB = "breakout";
+function switchTab(name) {
+  CURRENT_TAB = name;
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  document.getElementById("view-rss").style.display = name === "rss" ? "contents" : "none";
+  document.getElementById("view-youtube").style.display = name === "youtube" ? "contents" : "none";
+  document.getElementById("view-breakout").style.display = name === "breakout" ? "flex" : "none";
+  // 떡상 탭: 좌측 사이드바(필터 칩) 숨기고 .layout 단일 칼럼 전체 폭
+  const isBo = name === "breakout";
+  document.querySelector(".layout").classList.toggle("breakout-mode", isBo);
+  const fbar = document.getElementById("filter-bar");
+  if (fbar) fbar.style.display = isBo ? "none" : "";
+  document.getElementById("dateSel").style.display = name === "rss" ? "" : "none";
+  document.getElementById("ytDateSel").style.display = name === "youtube" ? "" : "none";
+  document.getElementById("ytStats").style.display = name === "youtube" ? "" : "none";
+  document.getElementById("rssStats").style.display = name === "rss" ? "" : "none";
+  document.getElementById("rssSliders").style.display = name === "rss" ? "" : "none";
+  document.getElementById("ytSliders").style.display = name === "youtube" ? "" : "none";
+  document.getElementById("rssWinCol").style.display = name === "rss" ? "" : "none";
+  document.getElementById("ytWinCol").style.display = name === "youtube" ? "" : "none";
+  document.getElementById("sortSel").style.display = name === "rss" ? "" : "none";
+  document.getElementById("ytSortSel").style.display = name === "youtube" ? "" : "none";
+  if (name === "youtube") loadYtDates();
+  if (name === "breakout") loadBoCategories().then(loadBreakout);
+  // 탭 전환 후 컨테이너가 보이게 됐을 때 scrollSpy 재바인딩 (숨김 상태에서 잘못 잡힌 active 보정)
+  if (name === "rss") {
+    const grid = document.getElementById("grid");
+    if (grid && grid.children.length) setupScrollSpy(grid.parentElement, "#grid .card", "#toc-rss .toc-item");
+  } else if (name === "youtube") {
+    const yg = document.getElementById("ytGrid");
+    if (yg && yg.children.length) setupScrollSpy(yg.parentElement, "#ytGrid .yt-card", "#toc-yt .toc-item");
+  }
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => switchTab(t.dataset.tab)));
+
+// ===== 🚨 떡상 감시기 =====
+let BO_DATA = null;
+const BO_COLLAPSED = { base: true, watch: true };  // 베이스·watch 기본 접힘
+
+
+function boFmt(n) {
+  if (n == null) return "—";
+  if (n >= 10000) return (n / 10000).toFixed(n >= 100000 ? 0 : 1) + "만";
+  return n.toLocaleString();
+}
+
+// 마지막 감지(수집) 시각 → 상대시간 문자열. generated_at은 UTC ISO.
+function boLastRun(iso) {
+  if (!iso) return "";
+  const t = new Date(iso).getTime();
+  if (isNaN(t)) return "";
+  const min = Math.floor((Date.now() - t) / 60000);
+  if (min < 1) return "방금";
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}시간 전`;
+  const day = Math.floor(hr / 24);
+  return `${day}일 전`;
+}
+
+function boRowHtml(r, rank) {
+  const longTag = r.long ? '' : '<span title="숏폼">📱</span>';
+  const takeBtn = (r.tier === 'hot' || r.tier === 'rising')
+    ? `<button class="bo-take" data-bo-take="${escapeHtml(r.video_id)}">🔗 링크 복사</button>`
+    : '';
+  const thumb = r.thumbnail
+    ? `<a href="${escapeHtml(r.url)}" target="_blank" class="bo-thumb"><img src="${escapeHtml(r.thumbnail)}" loading="lazy" alt="" onerror="this.parentNode.classList.add('bo-thumb-empty');this.remove();this.parentNode.textContent='▶';"></a>`
+    : `<div class="bo-thumb bo-thumb-empty">▶</div>`;
+  // 판단 핵심 3지표: 속도지수 · 조회수 · 게시시간 — 한 덩어리로 묶어 한눈 비교
+  const ageTxt = r.age != null ? (r.age < 1 ? Math.round(r.age*24)+'시간' : r.age+'일') : '—';
+  // 속도지수 = 절대 지수. 하루 10만 증가 = 100 (100 넘으면 그 이상, 예 500=하루 50만).
+  // 나이·날짜 무관한 고정 기준이라 어제 지수와 오늘 지수를 직접 비교 가능.
+  const score = r.velocity_score ?? 0;
+  const speedLabel = r.delta != null ? '속도지수' : '속도지수 (추정)';
+  const speedCls = r.delta != null ? (score >= 100 ? 'up' : 'flat') : 'est';
+  // 효율 = 조회수 / 구독자. 속도지수가 못 보는 '체급 대비 얼마나 퍼졌나'.
+  // 1배 = 구독자 수만큼 조회. 미상(구독자 0/비공개)은 '—'로 두고 배수와 구분한다.
+  // 기준선(몇 배부터 강조할지)은 실제 분포를 보고 정할 예정 — 지금은 1배만 표시 구분.
+  const eff = r.efficiency;
+  // 1배 미만은 소수 둘째 자리까지(0.18 vs 0.24를 뭉개지 않는다 — 이 구간이 '구독자도 안 봄' 판별선)
+  const effTxt = eff == null ? '—'
+    : eff >= 10 ? Math.round(eff) + '배'
+    : eff >= 1 ? eff.toFixed(1) + '배'
+    : eff.toFixed(2) + '배';
+  const effPop = eff != null && eff >= 1;
+  const effTitle = eff == null
+    ? '구독자 수를 알 수 없어 계산 불가 (다음 감지부터 채워짐)'
+    : `조회수 ${boFmt(r.views)} ÷ 구독자 ${boFmt(r.subscriber_count || 0)} = ${eff}배. 1배면 구독자 수만큼 조회된 것.`;
+  return `<div class="bo-card ${r.tier}">
+    <div class="bo-card-top">
+      <span class="bo-rank">${rank}</span>
+      ${thumb}
+      <div class="bo-card-head">
+        <div class="bo-card-src"><span class="chnl">${escapeHtml(r.whitelist_name || r.channel_title || '')}</span>${longTag}</div>
+        <a href="${escapeHtml(r.url)}" target="_blank" class="bo-card-title">${escapeHtml(r.title)}</a>
+      </div>
+    </div>
+    <div class="bo-stats${takeBtn ? ' has-take' : ''}">
+      <div class="bo-stat bo-stat-speed ${speedCls}" title="절대 지수: 하루 10만 조회 증가 = 100. 500이면 하루 50만 증가. 나이·날짜 무관한 고정 기준이라 매일 같은 잣대로 비교됨.">
+        <span class="v">${score}</span>
+        <span class="k">${speedLabel}</span>
+      </div>
+      <div class="bo-stat">
+        <span class="v">${boFmt(r.views)}</span>
+        <span class="k">조회수</span>
+      </div>
+      <div class="bo-stat bo-stat-eff${effPop ? ' pop' : ''}" title="${effTitle}">
+        <span class="v">${effTxt}</span>
+        <span class="k">효율</span>
+      </div>
+      <div class="bo-stat">
+        <span class="v">${ageTxt}</span>
+        <span class="k">게시</span>
+      </div>
+      ${takeBtn}
+    </div>
+  </div>`;
+}
+
+function boSectionHtml(key, label, rows) {
+  if (!rows.length) return "";
+  const collapsed = BO_COLLAPSED[key];
+  const cards = collapsed ? "" : `<div class="bo-grid">${rows.map((r, i) => boRowHtml(r, i + 1)).join("")}</div>`;
+  return `<div class="bo-section" data-bo-sec="${key}">
+    <div class="bo-sec-head" data-bo-toggle="${key}">
+      <span>${label}</span><span class="cnt">(${rows.length})</span>
+      <span class="caret">${collapsed ? '▸ 펼치기' : '▾ 접기'}</span>
+    </div>
+    ${cards}
+  </div>`;
+}
+
+function renderBreakout() {
+  const board = document.getElementById("boBoard");
+  const empty = document.getElementById("boEmpty");
+  const dateEl = document.getElementById("boDate");
+  boSyncCollectBtn();  // 탭 전환 시 이 분류가 감지 중인지에 따라 버튼 상태 갱신
+  // 정렬 버튼·필터 슬라이더는 데이터 유무와 무관하게 '항상' 먼저 갱신
+  // (데이터 0건이어도 조작이 먹힌 게 보여야 한다)
+  document.querySelectorAll("#boSort .bo-sort-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.sort === BO_SORT));
+  boSyncSliders();
+  if (!BO_DATA || !BO_DATA.leaderboard || !BO_DATA.leaderboard.length) {
+    board.innerHTML = ""; empty.style.display = ""; dateEl.textContent = "—";
+    return;
+  }
+  empty.style.display = "none";
+  const st = BO_DATA.stats || {};
+  const exTxt = st.shorts_excluded ? ` · 숏폼 ${st.shorts_excluded} 제외` : "";
+  const lastTxt = boLastRun(BO_DATA.generated_at);
+  dateEl.innerHTML = `${BO_DATA.date} · 표시 ${st.shown ?? BO_DATA.leaderboard.length}건${exTxt}`
+    + (lastTxt ? ` <span class="bo-last" title="마지막 떡상 감지(수집) 시각">· 감지 ${lastTxt}</span>` : "");
+  // 프론트 즉석 필터 — 재수집 없이 보이는 것만 거른다.
+  // 조회수 최소 + 구독자 최대. 구독자 미상(0)은 구독자 필터를 켰을 때만 제외한다
+  // (효율을 못 재는 항목이라 '작은 채널만' 요구와 부합하는지 알 수 없음).
+  const lb = BO_DATA.leaderboard.filter(r => {
+    if ((r.views || 0) < BO_MIN_VIEWS) return false;
+    if (BO_MAX_SUBS != null) {
+      const sc = r.subscriber_count;
+      if (!sc) return false;              // 구독자 미상/0 → 판별 불가라 제외
+      if (sc > BO_MAX_SUBS) return false;
+    }
+    return true;
+  });
+  // 필터 결과 없으면 '해당 없음' 명시 (빈 화면 = 작동여부 미지수 방지)
+  if (!lb.length) {
+    const total = BO_DATA.leaderboard.length;
+    const minTxt = BO_MIN_VIEWS >= 10000 ? `${(BO_MIN_VIEWS/10000).toFixed(0)}만` : BO_MIN_VIEWS.toLocaleString();
+    const condTxt = BO_MAX_SUBS != null
+      ? `조회수 ${minTxt}↑ · 구독자 ${BO_SUB_STEPS[_stepIndex(BO_SUB_STEPS, BO_MAX_SUBS)].t}`
+      : `${minTxt} 이상`;
+    board.innerHTML = `<div class="bo-min-none">📭 <b>${condTxt} 해당 없음</b><br>`
+      + `<span style="font-size:11px">추적 중 ${total}건 — 슬라이더를 오른쪽으로 밀어 조건을 넓히거나 다음 감지를 기다리세요.</span></div>`;
+    return;
+  }
+  const byTier = { hot: [], rising: [], base: [], watch: [] };
+  lb.forEach(r => (byTier[r.tier] || byTier.watch).push(r));
+  // 정렬 기준: 속도지수순(기본) 또는 조회수순 — 각 등급 섹션 내부에 적용
+  // 날짜순 = 업로드 최신순(published_at 내림차순). 값 없으면 맨 아래로.
+  // 효율순: 구독자 미상(null)은 -1로 떨어뜨려 맨 아래. 0배와 섞이지 않게 한다.
+  const cmp = BO_SORT === "views"
+    ? (a, b) => (b.views || 0) - (a.views || 0)
+    : BO_SORT === "date"
+    ? (a, b) => (Date.parse(b.published_at) || 0) - (Date.parse(a.published_at) || 0)
+    : BO_SORT === "eff"
+    ? (a, b) => (b.efficiency ?? -1) - (a.efficiency ?? -1)
+    : (a, b) => (b.velocity_score || 0) - (a.velocity_score || 0);
+  Object.values(byTier).forEach(arr => arr.sort(cmp));
+  // 첫날(hot 항목에 delta 없음)이면 "속도 추정 상위", 속도 확보되면 "지금 가속 중"
+  const firstDay = byTier.hot.length && byTier.hot[0].delta == null;
+  const hotLabel = firstDay ? "🔥 속도 추정 상위 (첫날)" : "🔥 지금 가속 중 (HOT)";
+  const baseLabel = firstDay ? "🧊 천천히 누적 중" : "🧊 베이스 (대형채널 일상)";
+  board.innerHTML =
+    boSectionHtml("hot", hotLabel, byTier.hot) +
+    boSectionHtml("rising", "📈 상승 중", byTier.rising) +
+    boSectionHtml("base", baseLabel, byTier.base) +
+    boSectionHtml("watch", "⏳ 승급 대기", byTier.watch);
+}
+
+let BO_AUTOFILL_TRIED = false;  // 세션당 자동 보정 1회만 시도(무한루프 방지)
+let BO_SCHED_ENABLED = false;   // 자동 실행 스케줄 ON 여부 (loadSchedState가 갱신)
+let BO_SORT = "score";          // 리더보드 정렬: "score"(속도지수) | "views"(조회수)
+let BO_MIN_VIEWS = 500000;      // 조회수 최소 필터(프론트 즉석)
+let BO_MAX_SUBS = null;         // 구독자 최대 필터(null=전체). 작은 채널의 폭발만 보려는 용도
+
+// 스냅 슬라이더 눈금 — 두 슬라이더 모두 '큰수 → 작은수 → 전체' 같은 방향.
+// 왼쪽 끝이 가장 빡빡하고 오른쪽 끝이 전체라, 미는 감각이 둘 다 일치한다.
+// value(null)는 '제한 없음'. 배열 순서가 곧 슬라이더 인덱스다.
+const BO_MIN_STEPS = [
+  { v: 2000000, t: "200만↑" },
+  { v: 1000000, t: "100만↑" },
+  { v:  500000, t: "50만↑"  },
+  { v:  300000, t: "30만↑"  },
+  { v:  100000, t: "10만↑"  },
+  { v:   50000, t: "5만↑"   },
+  { v:   10000, t: "1만↑"   },
+  { v:       0, t: "전체"   },
+];
+// 구독자는 조회수와 개념이 반대다(조회수는 많을수록·구독자는 적을수록 빡빡).
+// 그래서 배치도 반대로: 왼쪽이 전체(느슨), 오른쪽으로 갈수록 더 작은 채널만.
+// 두 슬라이더가 가운데를 사이에 두고 거울처럼 마주본다.
+const BO_SUB_STEPS = [
+  { v:    null, t: "전체" },
+  { v: 500000, t: "50만↓" },
+  { v: 100000, t: "10만↓" },
+  { v:  50000, t: "5만↓"  },
+  { v:  20000, t: "2만↓"  },
+  { v:  10000, t: "1만↓"  },
+  { v:   5000, t: "5천↓"  },
+  { v:   1000, t: "1천↓"  },
+];
+// 값 → 인덱스. 저장된 값이 눈금에 없으면 가장 가까운 눈금으로 흡수(옛 저장값 호환).
+function _stepIndex(steps, val) {
+  const i = steps.findIndex(s => s.v === val);
+  if (i >= 0) return i;
+  if (val == null) {
+    const n = steps.findIndex(s => s.v == null);
+    return n >= 0 ? n : 0;   // '전체' 위치는 배열마다 다르다(조회수=끝, 구독자=앞)
+  }
+  let best = 0, gap = Infinity;
+  steps.forEach((s, j) => {
+    if (s.v == null) return;
+    const g = Math.abs(s.v - val);
+    if (g < gap) { gap = g; best = j; }
+  });
+  return best;
+}
+
+// 슬라이더 위치·라벨을 현재 상태값에 맞춘다 (상태 → 화면 단방향).
+// 눈금 점은 스텝 수만큼 한 번만 깔면 되므로 비어 있을 때만 그린다.
+function boSyncSliders() {
+  const mr = document.getElementById("boMinRange");
+  const sr = document.getElementById("boSubRange");
+  if (!mr || !sr) return;
+  const mt = document.getElementById("boMinTicks");
+  const st = document.getElementById("boSubTicks");
+  if (mt && !mt.children.length) mt.innerHTML = BO_MIN_STEPS.map(() => "<i></i>").join("");
+  if (st && !st.children.length) st.innerHTML = BO_SUB_STEPS.map(() => "<i></i>").join("");
+  mr.max = BO_MIN_STEPS.length - 1;
+  sr.max = BO_SUB_STEPS.length - 1;
+  const mi = _stepIndex(BO_MIN_STEPS, BO_MIN_VIEWS);
+  const si = _stepIndex(BO_SUB_STEPS, BO_MAX_SUBS);
+  mr.value = mi;
+  sr.value = si;
+  document.getElementById("boMinVal").textContent = BO_MIN_STEPS[mi].t;
+  document.getElementById("boSubVal").textContent = BO_SUB_STEPS[si].t;
+}
+let BO_CATEGORY = null;         // 현재 선택된 분류 id
+let BO_CATS = [];               // 분류 목록 [{id,name,channel_count,...}]
+function _utcToday() {
+  return new Date().toISOString().slice(0, 10);  // YYYY-MM-DD (UTC) — radar.py 날짜 규약과 일치
+}
+
+// 분류별 min 필터 저장 (localStorage)
+const BO_MIN_STORE = "newsradar_min_by_cat";
+function _loadMinFor(catId) {
+  try {
+    const m = JSON.parse(localStorage.getItem(BO_MIN_STORE) || "{}");
+    return m[catId];
+  } catch { return undefined; }
+}
+function _saveMinFor(catId, v) {
+  try {
+    const m = JSON.parse(localStorage.getItem(BO_MIN_STORE) || "{}");
+    m[catId] = v; localStorage.setItem(BO_MIN_STORE, JSON.stringify(m));
+  } catch {}
+}
+
+// 분류별 구독자 상한 저장. null(전체)도 유효한 값이라 undefined와 구분해 다룬다.
+const BO_SUB_STORE = "newsradar_maxsubs_by_cat";
+function _loadSubFor(catId) {
+  try {
+    const m = JSON.parse(localStorage.getItem(BO_SUB_STORE) || "{}");
+    return m[catId];
+  } catch { return undefined; }
+}
+function _saveSubFor(catId, v) {
+  try {
+    const m = JSON.parse(localStorage.getItem(BO_SUB_STORE) || "{}");
+    m[catId] = v; localStorage.setItem(BO_SUB_STORE, JSON.stringify(m));
+  } catch {}
+}
+
+// 분류별 기본 슬라이더 위치 — 저장된 선택이 없을 때만 쓴다.
+//
+// 분류마다 보려는 그림이 정반대다:
+//   언론사형(대형 채널) — 구독자 수백만이 기본이라 구독자 상한은 '전체',
+//                        대신 조회수 고점(100만↑)에서 봐야 의미 있는 것만 남는다.
+//   양산형(중소 채널)   — 구독자가 적고 조회수 절대값도 낮아, 조회수를 낮추고
+//                        구독자 상한을 걸어야 '작은데 터진 것'이 보인다.
+// 매번 양쪽을 반대로 다시 미는 수고를 없애려고 분류 성격에서 자동으로 잡아준다.
+//
+// 성격 판별은 config의 track_threshold를 쓴다(분류 이름 하드코딩 금지 —
+// 새 분류가 생겨도 코드를 고칠 필요가 없어야 한다). 언론사만 10만, 나머지 1만.
+function _defaultsFor(catId) {
+  const cat = BO_CATS.find(c => c.id === catId);
+  const th = Number(cat?.breakout?.track_threshold) || 10000;
+  return th >= 100000
+    ? { min: 1000000, sub: null }      // 대형: 조회수 100만↑ · 구독자 전체
+    : { min: 100000,  sub: 500000 };   // 양산형: 조회수 10만↑ · 구독자 50만↓
+}
+
+// 분류의 슬라이더 상태를 적용한다. 저장된 선택이 있으면 그것,
+// 없으면 분류 성격 기본값. '현재값 유지'는 하지 않는다 —
+// 직전 분류의 설정이 새 분류로 새어 들어가면 매번 다시 맞춰야 한다.
+function boApplyCatFilters(catId) {
+  const d = _defaultsFor(catId);
+  const savedMin = _loadMinFor(catId);
+  const savedSub = _loadSubFor(catId);
+  BO_MIN_VIEWS = savedMin !== undefined && savedMin !== null ? savedMin : d.min;
+  BO_MAX_SUBS  = savedSub !== undefined ? savedSub : d.sub;   // null(전체)도 저장된 선택
+}
+
+// 분류 사이드바 로드/렌더
+async function loadBoCategories() {
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar/categories");
+    BO_CATS = r.ok ? (await r.json()).categories || [] : [];
+  } catch (e) { BO_CATS = []; }
+  // 선택 분류 없으면 첫 번째 (새로고침 초기 진입 시)
+  if (!BO_CATEGORY || !BO_CATS.find(c => c.id === BO_CATEGORY)) {
+    BO_CATEGORY = BO_CATS[0]?.id || null;
+    // 저장된 선택이 있으면 그것, 없으면 분류 성격에 맞는 기본값
+    if (BO_CATEGORY) boApplyCatFilters(BO_CATEGORY);
+  }
+  renderBoCategories();
+}
+function renderBoCategories() {
+  const list = document.getElementById("boCatList");
+  list.innerHTML = BO_CATS.map(c => `
+    <div class="bo-cat-row ${c.id === BO_CATEGORY ? 'active' : ''}${c.auto_collect === false ? ' paused' : ''}" data-cat="${escapeHtml(c.id)}">
+      <span class="bo-cat-name">${escapeHtml(c.name)}</span>
+      ${c.auto_collect === false ? '<span class="bo-cat-auto" title="자동 수집 꺼짐 — 매일 자동 감지에서 제외됩니다">⏸</span>' : ''}
+      <span class="bo-cat-cnt">${c.channel_count}</span>
+      <button class="bo-cat-gear" data-cat-gear="${escapeHtml(c.id)}" title="채널 관리">⚙</button>
+    </div>`).join("") || `<div style="font-size:11px;color:var(--fg-dim);padding:8px">분류 없음 — + 추가</div>`;
+  const cur = BO_CATS.find(c => c.id === BO_CATEGORY);
+  document.getElementById("boCatTitle").textContent = cur ? cur.name + " 떡상 감시" : "떡상 감시";
+}
+
+async function selectCategory(catId) {
+  BO_CATEGORY = catId;
+  boApplyCatFilters(catId);   // 분류마다 슬라이더 셋팅이 정반대라 매번 새로 적용
+  renderBoCategories();
+  await loadBreakout();
+}
+
+async function loadBreakout() {
+  if (!BO_CATEGORY) { BO_DATA = null; renderBreakout(); await loadSchedState(); return; }
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar/" + encodeURIComponent(BO_CATEGORY) + "/latest");
+    BO_DATA = r.ok ? await r.json() : null;
+  } catch (e) { BO_DATA = null; }
+  renderBreakout();
+  await loadSchedState();
+  await maybeAutofillToday();
+}
+
+// 절전 복귀 등으로 오늘 스냅샷이 없으면 자동 1회 수집.
+// 자동 실행(스케줄)이 ON일 때만 — OFF면 사용자가 자동 수집을 원치 않는 것으로 본다.
+async function maybeAutofillToday() {
+  if (BO_AUTOFILL_TRIED || !BO_SCHED_ENABLED) return;
+  const today = _utcToday();
+  const haveToday = BO_DATA && BO_DATA.date === today;
+  if (haveToday) return;
+  // 이미 실행 중이면 건드리지 않음
+  try {
+    const sr = await fetch(BACKEND + "/api/status");
+    const st = await sr.json();
+    if (st.running) return;
+  } catch (e) {}
+  BO_AUTOFILL_TRIED = true;
+  showToast("오늘 스냅샷 없음 — 자동 수집 시작 (절전 복귀 보정)");
+  setRunStatus("떡상 자동 보정 수집 중…");
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dry_run: false, category: BO_CATEGORY }),
+    });
+    if (r.ok) startPolling(CURRENT_CHANNEL);  // 완료 시 loadBreakout 재호출됨(폴링 완료 분기)
+  } catch (e) { setRunStatus("자동 보정 실패: " + e.message); }
+}
+
+// 자동 실행 스케줄 상태 토글
+async function loadSchedState() {
+  const btn = document.getElementById("bo-sched-toggle");
+  const stateEl = document.getElementById("boSchedState");
+  const hourSel = document.getElementById("boSchedHour");
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar/schedule");
+    const d = await r.json();
+    BO_SCHED_ENABLED = !!d.enabled;
+    btn.classList.toggle("on", BO_SCHED_ENABLED);
+    if (BO_SCHED_ENABLED) {
+      stateEl.textContent = "ON";
+      if (d.time) {
+        stateEl.textContent = "ON " + d.time;
+        const h = parseInt(d.time.split(":")[0], 10);
+        if (!isNaN(h)) hourSel.value = String(h);
+      }
+    } else {
+      stateEl.textContent = "OFF";
+    }
+  } catch (e) { stateEl.textContent = "?"; }
+}
+document.getElementById("bo-sched-toggle").addEventListener("click", async () => {
+  const btn = document.getElementById("bo-sched-toggle");
+  const stateEl = document.getElementById("boSchedState");
+  const hour = parseInt(document.getElementById("boSchedHour").value, 10) || 9;
+  const next = !BO_SCHED_ENABLED;
+  btn.disabled = true; stateEl.textContent = "…";
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar/schedule", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled: next, hour }),
+    });
+    const d = await r.json();
+    if (d.ok === false) showToast("스케줄 변경 실패: " + (d.msg || d.error || "").slice(0, 100));
+    else showToast(next ? `자동 실행 ON — 매일 ${String(hour).padStart(2,'0')}:00` : "자동 실행 OFF");
+  } catch (e) { showToast("요청 실패: " + e.message); }
+  btn.disabled = false;
+  await loadSchedState();
+});
+// 시각 변경 시 이미 ON이면 재등록
+document.getElementById("boSchedHour").addEventListener("change", async () => {
+  if (!BO_SCHED_ENABLED) return;
+  const hour = parseInt(document.getElementById("boSchedHour").value, 10) || 9;
+  await fetch(BACKEND + "/api/newsradar/schedule", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ enabled: true, hour }),
+  });
+  showToast(`자동 실행 시각 변경 — 매일 ${String(hour).padStart(2,'0')}:00`);
+  await loadSchedState();
+});
+
+// 섹션 접기/펼치기 + 받기 버튼 (이벤트 위임)
+// 정렬 버튼 (속도지수순 / 조회수순 / 날짜순)
+document.getElementById("boSort").addEventListener("click", (e) => {
+  const sortBtn = e.target.closest(".bo-sort-btn");
+  if (sortBtn) {
+    if (sortBtn.dataset.sort === BO_SORT) return;
+    BO_SORT = sortBtn.dataset.sort;
+    renderBreakout();
+    return;
+  }
+});
+
+// 필터 슬라이더 — 드래그 중(input)에도 즉시 반영. 리더보드는 프론트 필터라 재수집 없음.
+// 값이 실제로 바뀐 눈금에서만 렌더 (같은 눈금 안에서 흔들 때 불필요한 재렌더 방지).
+document.getElementById("boMinRange").addEventListener("input", (e) => {
+  const v = BO_MIN_STEPS[Number(e.target.value)]?.v;
+  if (v === undefined || v === BO_MIN_VIEWS) { boSyncSliders(); return; }
+  BO_MIN_VIEWS = v;
+  if (BO_CATEGORY) _saveMinFor(BO_CATEGORY, v);   // 분류별 기준 저장
+  renderBreakout();
+});
+document.getElementById("boSubRange").addEventListener("input", (e) => {
+  const v = BO_SUB_STEPS[Number(e.target.value)]?.v;
+  if (v === undefined || v === BO_MAX_SUBS) { boSyncSliders(); return; }
+  BO_MAX_SUBS = v;
+  if (BO_CATEGORY) _saveSubFor(BO_CATEGORY, v);
+  renderBreakout();
+});
+
+// 수동 수집 — 감지 중인 '분류 id'를 기억한다(전역 bool 아님).
+// 서버는 단일 실행이라 동시 감지 불가지만, UI는 어느 분류가 감지 중인지 구분해 표시.
+let BO_COLLECTING_CAT = null;   // 감지 중인 분류 id (없으면 null)
+let BO_COLLECT_T0 = 0;          // 감지 시작 시각
+
+// 지금 보고 있는 탭(BO_CATEGORY) 기준으로 [지금 감지] 버튼 상태를 그린다.
+function boSyncCollectBtn() {
+  const btn = document.getElementById("bo-collect");
+  if (!btn) return;
+  if (BO_COLLECTING_CAT && BO_COLLECTING_CAT === BO_CATEGORY) {
+    // 지금 보는 분류가 감지 중 → 스피너 + 경과초
+    const el = Math.floor((Date.now() - BO_COLLECT_T0) / 1000);
+    btn.disabled = true;
+    btn.innerHTML = `<span class="bo-spin"></span> 감지 중… ${el}초`;
+  } else if (BO_COLLECTING_CAT) {
+    // 다른 분류가 감지 중 → 이 버튼은 비활성(중복 실행 방지), 안내 문구
+    btn.disabled = true;
+    btn.innerHTML = "다른 분류 감지 중…";
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = "🔄 지금 감지";
+  }
+}
+
+async function runBreakoutCollect() {
+  if (BO_COLLECTING_CAT) { showToast("이미 감지 실행 중입니다 (완료 후 다시)"); return; }
+  if (!BO_CATEGORY) { showToast("분류를 먼저 선택하세요"); return; }
+  try {
+    const sr = await fetch(BACKEND + "/api/status");
+    if ((await sr.json()).running) { showToast("이미 감지 실행 중입니다"); return; }
+  } catch (e) {}
+  const cat = BO_CATEGORY;          // 이 감지가 대상으로 삼는 분류 고정
+  BO_COLLECTING_CAT = cat;
+  BO_COLLECT_T0 = Date.now();
+  boSyncCollectBtn();
+  setRunStatus("떡상 감지 수집 중…");
+  const tick = setInterval(boSyncCollectBtn, 1000);  // 경과초 갱신(현재 탭이 그 분류일 때만 보임)
+  const finish = async (msg) => {
+    clearInterval(tick);
+    BO_COLLECTING_CAT = null;
+    boSyncCollectBtn();
+    if (msg) showToast(msg);
+    setRunStatus("");
+    await loadBoCategories();
+    // 감지한 분류를 지금 보고 있을 때만 결과 새로고침(다른 탭 보고 있으면 그대로 둠)
+    if (BO_CATEGORY === cat) await loadBreakout();
+  };
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dry_run: false, category: cat }),
+    });
+    if (r.status === 409) { await finish("이미 실행 중"); return; }
+    if (!r.ok) { await finish("감지 실패: " + r.status); return; }
+  } catch (e) { await finish("요청 실패: " + e.message); return; }
+  let waited = 0;
+  const poll = setInterval(async () => {
+    waited += 2;
+    let running = true;
+    try {
+      const s = await (await fetch(BACKEND + "/api/status")).json();
+      running = !!s.running;
+    } catch (e) {}
+    if (!running || waited >= 90) {
+      clearInterval(poll);
+      await finish(waited >= 90 ? "감지 시간 초과(90초)" : "✅ 감지 완료");
+    }
+  }, 2000);
+}
+document.getElementById("bo-collect").addEventListener("click", runBreakoutCollect);
+
+// 사이드바: 분류 선택 + ⚙ 채널관리
+document.getElementById("boCatList").addEventListener("click", (e) => {
+  const gear = e.target.closest("[data-cat-gear]");
+  if (gear) { e.stopPropagation(); openBreakoutManage(gear.dataset.catGear); return; }
+  const row = e.target.closest(".bo-cat-row");
+  if (row && row.dataset.cat) selectCategory(row.dataset.cat);
+});
+
+// 분류 추가 모달
+document.getElementById("bo-cat-add").addEventListener("click", () => {
+  document.getElementById("catAddName").value = "";
+  document.getElementById("catAddMsg").textContent = "";
+  document.getElementById("modal-cat-add").style.display = "flex";
+  document.getElementById("catAddName").focus();
+});
+// 분류 id는 서버가 발급한다(폴더명·URL용 내부값이라 사용자가 정할 이유가 없다).
+// 이름만 받고, 응답으로 온 id로 그 분류를 연다.
+document.getElementById("cat-add-confirm").addEventListener("click", async () => {
+  const name = document.getElementById("catAddName").value.trim();
+  const msg = document.getElementById("catAddMsg");
+  if (!name) { msg.textContent = "분류 이름을 입력하세요"; return; }
+  msg.textContent = "추가 중…";
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar/category", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add", name }),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      document.getElementById("modal-cat-add").style.display = "none";
+      await loadBoCategories();
+      await selectCategory(d.id);
+      showToast(`분류 '${name}' 추가 — 자동 수집은 꺼진 상태입니다`);
+    } else { msg.textContent = d.error || "실패"; }
+  } catch (e) { msg.textContent = "요청 실패: " + e.message; }
+});
+// 이름 입력 후 Enter로 바로 추가
+document.getElementById("catAddName").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("cat-add-confirm").click();
+});
+
+document.getElementById("boBoard").addEventListener("click", async (e) => {
+  const toggle = e.target.closest("[data-bo-toggle]");
+  if (toggle) {
+    const k = toggle.dataset.boToggle;
+    BO_COLLAPSED[k] = !BO_COLLAPSED[k];
+    renderBreakout();
+    return;
+  }
+  const take = e.target.closest("[data-bo-take]");
+  if (take) {
+    const vid = take.dataset.boTake;
+    const row = (BO_DATA?.leaderboard || []).find(x => x.video_id === vid);
+    if (row) boTake(row, take);
+  }
+});
+
+async function boTake(row, btn) {
+  // 떡상 후보 → 바로 RSS/YT 후보 풀로 보내는 대신, 영상 URL을 클립보드+안내.
+  // (newsradar 후보는 기존 candidates 파이프라인과 id 체계가 달라, 우선 URL 전달로 연결)
+  btn.disabled = true; btn.textContent = "✓ 복사됨";
+  try { await navigator.clipboard.writeText(row.url); } catch (e) {}
+  showToast(`링크 복사됨: ${row.title.slice(0, 24)}… — 대본 시작 시 붙여넣으세요`);
+  setTimeout(() => { btn.disabled = false; btn.textContent = "🔗 링크 복사"; }, 1500);
+}
+
+// 채널 관리 모달 (분류별) — 사이드바 ⚙에서 catId 받아 연다
+let BO_MNG_CAT = null;
+async function openBreakoutManage(catId) {
+  BO_MNG_CAT = catId || BO_CATEGORY;
+  if (!BO_MNG_CAT) return;
+  const cat = BO_CATS.find(c => c.id === BO_MNG_CAT);
+  document.getElementById("boMngCatName").textContent = cat ? cat.name : BO_MNG_CAT;
+  document.getElementById("modal-breakout").style.display = "flex";
+  document.getElementById("boAddMsg").textContent = "";
+  document.getElementById("boAddInput").value = "";
+  _renderAutoToggle(cat ? cat.auto_collect !== false : true);
+  await _renderMngChannels();
+}
+function _renderAutoToggle(on) {
+  const btn = document.getElementById("bo-auto-toggle");
+  document.getElementById("boAutoState").textContent = on ? "ON" : "OFF";
+  btn.classList.toggle("on", on);
+}
+document.getElementById("bo-auto-toggle").addEventListener("click", async () => {
+  if (!BO_MNG_CAT) return;
+  const cat = BO_CATS.find(c => c.id === BO_MNG_CAT);
+  const next = !(cat ? cat.auto_collect !== false : true);
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar/category", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "toggle_auto", id: BO_MNG_CAT, enabled: next }),
+    });
+    const d = await r.json();
+    if (d.ok) {
+      _renderAutoToggle(d.auto_collect);
+      await loadBoCategories();  // BO_CATS 갱신
+      showToast(next ? "자동 수집 ON — 매일 자동 감지에 포함" : "자동 수집 OFF — 이 분류는 자동 감지 제외");
+    }
+  } catch (e) {}
+});
+// channel_id(UC…) → 유튜브 채널 URL. 저장된 값이 이미 URL/@핸들이면 그대로 살린다.
+function boChannelUrl(cid) {
+  const s = String(cid || "").trim();
+  if (/^https?:\/\//i.test(s)) return s;
+  if (s.startsWith("@")) return "https://www.youtube.com/" + s;
+  return "https://www.youtube.com/channel/" + s;
+}
+let BO_MNG_LIST = [];
+async function _renderMngChannels() {
+  const wl = document.getElementById("boWhitelist");
+  wl.innerHTML = "불러오는 중…";
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar/" + encodeURIComponent(BO_MNG_CAT) + "/channels");
+    const d = await r.json();
+    const list = d.channels || [];
+    BO_MNG_LIST = list;
+    wl.innerHTML = list.map(w =>
+      `<div class="bo-wl-row"><span>${escapeHtml(w.name)}</span><span class="cid">${escapeHtml(w.channel_id)}</span>`
+      + `<a class="bo-wl-open" href="${boChannelUrl(w.channel_id)}" target="_blank" rel="noopener" title="유튜브에서 열기">↗</a>`
+      + `<button class="bo-wl-open" data-ch-copy="${escapeHtml(w.channel_id)}" title="이 채널 링크 복사">⧉</button>`
+      + `<button class="bo-wl-del" data-ch-remove="${escapeHtml(w.channel_id)}" title="제거">✕</button></div>`
+    ).join("") || "<span style='color:var(--fg-dim)'>등록된 채널 없음</span>";
+  } catch (e) { BO_MNG_LIST = []; wl.innerHTML = "불러오기 실패"; }
+}
+// 클립보드 복사 (localhost가 아니면 navigator.clipboard가 막히므로 textarea 폴백)
+async function boCopy(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e2) { return false; }
+  }
+}
+// 채널 추가 (URL/핸들/검색어)
+document.getElementById("bo-add-btn").addEventListener("click", async () => {
+  const inp = document.getElementById("boAddInput");
+  const msg = document.getElementById("boAddMsg");
+  const q = inp.value.trim();
+  if (!q || !BO_MNG_CAT) return;
+  msg.textContent = "채널 확인 중… (몇 초 걸립니다)";
+  try {
+    const r = await fetch(BACKEND + "/api/newsradar/channel", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add", category: BO_MNG_CAT, url: q }),
+    });
+    const d = await r.json();
+    msg.textContent = d.ok ? `✓ 추가됨: ${d.name}` : ("실패: " + (d.error || "").slice(0, 120));
+    if (d.ok) { inp.value = ""; await _renderMngChannels(); await loadBoCategories(); }
+  } catch (e) { msg.textContent = "요청 실패: " + e.message; }
+});
+// 채널 제거 (이벤트 위임)
+document.getElementById("boWhitelist").addEventListener("click", async (e) => {
+  const cp = e.target.closest("[data-ch-copy]");
+  if (cp) {
+    const url = boChannelUrl(cp.dataset.chCopy);
+    showToast(await boCopy(url) ? "링크 복사됨: " + url : "복사 실패");
+    return;
+  }
+  const del = e.target.closest("[data-ch-remove]");
+  if (!del || !BO_MNG_CAT) return;
+  try {
+    await fetch(BACKEND + "/api/newsradar/channel", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "remove", category: BO_MNG_CAT, channel_id: del.dataset.chRemove }),
+    });
+    await _renderMngChannels(); await loadBoCategories();
+  } catch (e) {}
+});
+// 전체 링크 복사 — "채널명<탭>URL" 한 줄씩
+document.getElementById("bo-copy-links").addEventListener("click", async () => {
+  if (!BO_MNG_LIST.length) { showToast("등록된 채널 없음"); return; }
+  const text = BO_MNG_LIST.map(w => `${w.name}\t${boChannelUrl(w.channel_id)}`).join("\n");
+  showToast(await boCopy(text) ? `${BO_MNG_LIST.length}개 채널 링크 복사됨` : "복사 실패");
+});
+// 분류 삭제
+document.getElementById("bo-cat-delete").addEventListener("click", async () => {
+  if (!BO_MNG_CAT) return;
+  const cat = BO_CATS.find(c => c.id === BO_MNG_CAT);
+  if (!confirm(`'${cat ? cat.name : BO_MNG_CAT}' 분류를 삭제하시겠습니까? (채널 목록도 함께 삭제)`)) return;
+  try {
+    await fetch(BACKEND + "/api/newsradar/category", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", id: BO_MNG_CAT }),
+    });
+    document.getElementById("modal-breakout").style.display = "none";
+    if (BO_CATEGORY === BO_MNG_CAT) BO_CATEGORY = null;
+    await loadBoCategories();
+    await loadBreakout();
+  } catch (e) {}
+});
+
+async function loadYtDates() {
+  let dates = [];
+  try {
+    const r = await fetch(withCh(BACKEND + "/api/youtube/dates"));
+    if (r.ok) dates = (await r.json()).dates || [];
+  } catch (e) {}
+  const sel = document.getElementById("ytDateSel");
+  sel.innerHTML = "";
+  if (!dates.length) {
+    document.getElementById("ytEmpty").style.display = "";
+    document.getElementById("ytGrid").innerHTML = "";
+    document.getElementById("ytStats").textContent = "";
+    const toc = document.getElementById("toc-yt");
+    if (toc) toc.innerHTML = "";
+    return;
+  }
+  dates.forEach(d => {
+    const o = document.createElement("option");
+    o.value = d; o.textContent = d;
+    sel.appendChild(o);
+  });
+  sel.onchange = () => loadYtDaily(sel.value);
+  await loadYtDaily(dates[0]);
+}
+
+async function loadYtDaily(date) {
+  try {
+    const r = await fetch(withCh(BACKEND + "/api/youtube/" + date));
+    if (!r.ok) throw new Error("not_found");
+    YT_DATA = await r.json();
+    renderYt(YT_DATA);
+  } catch (e) {
+    document.getElementById("ytEmpty").style.display = "";
+    document.getElementById("ytGrid").innerHTML = "";
+  }
+}
+
+function escHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+function fmtViews(n) {
+  if (!n) return "0";
+  if (n >= 1000000) return (n/1000000).toFixed(1) + "M";
+  if (n >= 1000) return (n/1000).toFixed(0) + "K";
+  return String(n);
+}
+function fmtDur(sec) {
+  if (!sec) return "";
+  const m = Math.floor(sec/60);
+  const s = sec % 60;
+  return m > 0 ? `${m}:${String(s).padStart(2,'0')}` : `${s}s`;
+}
+function vidListHtml(arr) {
+  if (!arr || !arr.length) return '<li style="color:var(--fg-dim);font-size:10px;padding:4px 0">없음</li>';
+  return arr.slice(0,3).map(v => {
+    const subs = v.channel_subscriber_count;
+    const ratio = v.view_to_sub_ratio;
+    const cs = v.copy_score || 0;
+    const csBadge = cs >= 4 ? `<span class="cs-badge" title="카피 가치 점수 ${cs}">🎯${cs}</span>` : '';
+    const subTxt = subs ? `구독 ${fmtViews(subs)}` : '';
+    const ratTxt = (ratio && ratio >= 1) ? `×${ratio}` : '';
+    return `<li><a href="${escHtml(v.url)}" target="_blank">
+      <div class="vt">${escHtml(v.title || "")} ${csBadge}</div>
+      <div class="vm"><span>${escHtml(v.channel_title || "")}${subTxt ? ' · ' + subTxt : ''}</span><span class="views">${fmtViews(v.view_count)}${ratTxt ? ' '+ratTxt : ''}</span><span>${fmtDur(v.duration_sec)}</span></div>
+    </a></li>`;
+  }).join("");
+}
+function renderYt(data) {
+  const grid = document.getElementById("ytGrid");
+  const empty = document.getElementById("ytEmpty");
+  const stats = document.getElementById("ytStats");
+  const allAnalyses = (data && data.analyses) || [];
+  const ytDate = (data && data.date) || (document.getElementById("ytDateSel")?.value || "");
+  const analyses = allAnalyses
+    .filter(a => SELECTED_FRONTS.has(a.front_id))
+    .filter(a => !ARCHIVED_IDS.has(`yt:${ytDate}:${a.front_id}`))
+    .filter(a => {
+      const an = a.analysis || {};
+      const dem = Number(an.estimated_demand || 0);
+      const cmp = Number(an.competition_level || 0);
+      if (dem && dem < YT_DEM_MIN) return false;
+      if (cmp && cmp > YT_CMP_MAX) return false;
+      const tier = an.opportunity_tier || "mixed";
+      const rank = OPP_ORDER.indexOf(tier);
+      if (rank >= 0 && (rank + 1) > YT_OPP_MIN) return false;
+      return true;
+    });
+  // 정렬
+  analyses.sort((a, b) => {
+    const A = a.analysis || {}, B = b.analysis || {};
+    if (YT_SORT === "competition") return (Number(A.competition_level || 99) - Number(B.competition_level || 99));
+    if (YT_SORT === "demand") return (Number(B.estimated_demand || 0) - Number(A.estimated_demand || 0));
+    if (YT_SORT === "opportunity") return OPP_ORDER.indexOf(A.opportunity_tier || "red") - OPP_ORDER.indexOf(B.opportunity_tier || "red");
+    if (YT_SORT === "videos") return (Number(B.video_count || 0) - Number(A.video_count || 0));
+    return 0;
+  });
+  const st = (data && data.stats) || {};
+  const amb = st.ambiguous_count || 0;
+  stats.innerHTML = `<div class="yt-stat-grid">
+    <span>📺 트렌딩 <b>${st.trending_count||0}</b></span>
+    <span>📼 롱 <b>${st.long_count||0}</b></span>
+    <span>🔎 검색 <b>${st.search_count||0}</b></span>
+    <span>🎬 숏 <b>${st.short_count||0}</b></span>
+    <span>🧹 중복후 <b>${st.deduped_count||0}</b></span>
+    <span>🧠 분석 <b>${st.fronts_analyzed||0}</b>${amb ? ` <small style="color:var(--warn)">(🤔${amb})</small>` : ""}</span>
+  </div>`;
+  if (!analyses.length) {
+    empty.style.display = "";
+    grid.innerHTML = "";
+    return;
+  }
+  empty.style.display = "none";
+  grid.innerHTML = analyses.map((a, idx) => {
+    const an = a.analysis || {};
+    const sv = an.suggested_video || {};
+    const color = a.front_color || "#888";
+    const hot = (an.hot_topics || []).map(k => `<span style="display:inline-block;background:${color}22;border:1px solid ${color}66;color:${color};padding:3px 10px;border-radius:999px;font-size:11px;white-space:nowrap">${escHtml(k)}</span>`).join("");
+    const common = (an.common_angles || []).map(x => `<li>${escHtml(x)}</li>`).join("");
+    const missing = (an.missing_angles || []).map(x => `<li>${escHtml(x)}</li>`).join("");
+    const dem = Number(an.estimated_demand || 0);
+    const cmp = Number(an.competition_level || 0);
+    const demCls = dem >= 4 ? "high" : (dem >= 3 ? "mid" : "low");
+    const cmpCls = cmp <= 2 ? "high" : (cmp <= 3 ? "mid" : "low");
+    const totalCnt = an.video_count || 0;
+    const longCnt = an.long_count || 0;
+    const shortCnt = an.short_count || 0;
+    const ambCnt = an.ambiguous_count || 0;
+    const unkCnt = an.unknown_count || 0;
+    const oppLabels = {gold: "🟢 황금자리", ok: "🟢 좋음", mixed: "🟡 평범", weak: "⚪ 약함", gray: "⚪ 무관심", trap: "⚠️ 함정", red: "🔴 레드오션"};
+    const oppCls = an.opportunity_tier || "mixed";
+    const oppHtml = `<div class="opp-badge ${oppCls}">${oppLabels[oppCls] || ""}</div>`;
+    const ytId = `yt:${ytDate}:${a.front_id}`;
+    const inPool = CANDIDATE_IDS.has(ytId);
+    return `<div class="yt-card${inPool ? ' in-pool' : ''}" id="ytcard-${idx}" data-card-idx="${idx}" style="border-left:3px solid ${color}">
+      <div class="yt-head" style="align-items:center">
+        <div style="flex:1;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+          <div class="yt-title" style="color:${color}">${escHtml(a.front_name)}</div>
+          <div class="yt-meta" style="margin-top:0">${totalCnt}개 · 롱 ${longCnt} / 숏 ${shortCnt}${ambCnt ? ` / 모호 ${ambCnt}` : ""}${unkCnt ? ` / ? ${unkCnt}` : ""} · Top ${(an.top_views||0).toLocaleString()} views</div>
+        </div>
+        ${oppHtml}
+        <div class="yt-stats">
+          <div class="metric ${demCls}"><b>${dem||"-"}<small style="font-size:10px;color:var(--fg-dim);font-weight:400">/5</small></b><span>수요</span></div>
+          <div class="metric ${cmpCls}"><b>${cmp||"-"}<small style="font-size:10px;color:var(--fg-dim);font-weight:400">/5</small></b><span>경쟁</span></div>
+        </div>
+      </div>
+      ${an.trend_summary ? `<div class="yt-section"><div class="lbl">📈 트렌드</div>${escHtml(an.trend_summary)}</div>` : ""}
+      ${hot ? `<div class="yt-section"><div class="lbl">🔥 핫 토픽</div><div style="display:flex;flex-wrap:wrap;gap:6px">${hot}</div></div>` : ""}
+      ${(common || missing) ? `<div class="yt-angles-grid">
+        ${missing ? `<div class="yt-section miss"><div class="lbl">❌ 빠진 각도 — 빈 자리</div><ul>${missing}</ul></div>` : "<div></div>"}
+        ${common ? `<div class="yt-section"><div class="lbl">✅ 흔한 각도 (이미 많음)</div><ul>${common}</ul></div>` : "<div></div>"}
+      </div>` : ""}
+      ${(sv.hook || (a.related_rss && a.related_rss.length)) ? `<div class="yt-hook-row">
+        ${sv.hook ? `<div class="yt-hook">
+          <div class="lbl">💡 제안 영상</div>
+          <div class="hk">${escHtml(sv.hook)}</div>
+          <div class="tt">${escHtml(sv.title||"")}</div>
+          ${sv.why_gap ? `<div class="why">${escHtml(sv.why_gap)}</div>` : ""}
+        </div>` : "<div></div>"}
+        ${(a.related_rss && a.related_rss.length) ? `<div class="yt-section yt-related">
+          <div class="lbl">🔗 관련 뉴스 (RSS 매칭)</div>
+          <ul class="related-rss-list">${a.related_rss.map(r => `
+            <li><a href="#" data-related-rss="${escHtml(r.id)}" title="유사도 ${r.score}">
+              <span class="rr-score">${(r.score*100).toFixed(0)}%</span>
+              <span class="rr-title">${escHtml(r.one_line_summary || r.title || '')}</span>
+            </a></li>`).join("")}</ul>
+        </div>` : "<div></div>"}
+      </div>` : ""}
+      <div class="actions" style="margin-top:4px">
+        <button class="primary" data-yt-action="promote" data-yt-front="${a.front_id}" title="이 분야의 제안 영상을 후보 풀에 저장"${inPool ? ' disabled' : ''}>${inPool ? '✓ 후보 풀에 있음' : '⭐ 후보 풀에 추가'}</button>
+        <button data-yt-action="archive" data-yt-front="${a.front_id}" title="제외 풀로 이동(보관). 제외 풀에서 복원 가능">🚫 제외</button>
+      </div>
+      ${(an.top_copy_value_videos && an.top_copy_value_videos.length) ? `<div class="yt-section yt-copy-pick">
+        <div class="lbl">🎯 카피 가치 Top — 신생/중형 폭발 영상</div>
+        <ul class="vid-list">${vidListHtml(an.top_copy_value_videos)}</ul>
+      </div>` : ""}
+      <div class="yt-top-videos">
+        <div class="yt-top-section">
+          <div class="lbl">📺 롱폼 Top 3</div>
+          <ul class="vid-list">${vidListHtml(an.top_long_videos)}</ul>
+        </div>
+        <div class="yt-top-section">
+          <div class="lbl">🎬 숏폼 Top 3</div>
+          <ul class="vid-list">${vidListHtml(an.top_short_videos)}</ul>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+  // YT TOC
+  const toc = document.getElementById("toc-yt");
+  if (toc) {
+    toc.innerHTML = `<div class="toc-header">📺 ${analyses.length}개 분야</div>` + analyses.map((a, idx) => {
+      const an = a.analysis || {};
+      const color = a.front_color || '#888';
+      const sv = an.suggested_video || {};
+      const main = sv.title || sv.hook || (an.hot_topics || [])[0] || a.front_name || '';
+      return `<div class="toc-item" data-idx="${idx}" title="${escHtml(main)}">
+        <div class="yt-count">${an.video_count || 0}</div>
+        <div class="front-bar" style="background:${color}"></div>
+        <div class="toc-text">${escHtml(main.slice(0, 60))}<small>${escHtml(a.front_name || '')}</small></div>
+      </div>`;
+    }).join("");
+    toc.querySelectorAll('.toc-item').forEach(el => {
+      el.onclick = () => jumpToCard(el.dataset.idx, `ytcard-${el.dataset.idx}`, "#toc-yt .toc-item");
+    });
+  }
+  setupScrollSpy(grid.parentElement, "#ytGrid .yt-card", "#toc-yt .toc-item");
+
+  // 관련 RSS 클릭 → RSS 탭으로 점프
+  grid.querySelectorAll("[data-related-rss]").forEach(a => {
+    a.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const rssId = a.dataset.relatedRss;
+      switchTab("rss");
+      // 같은 날짜의 RSS daily가 이미 로드되어 있는지 확인
+      const date = (data && data.date);
+      if (date) {
+        const sel = document.getElementById("dateSel");
+        if (sel.value !== date) {
+          sel.value = date;
+          await loadDaily(date);
+        }
+      }
+      // 카드에서 매칭 후 점프
+      setTimeout(() => {
+        const cards = document.querySelectorAll('#grid .card');
+        for (const card of cards) {
+          const btn = card.querySelector('[data-action="promote"]');
+          if (btn && btn.dataset.id === rssId) {
+            jumpToCard(card.dataset.cardIdx, card.id, "#toc-rss .toc-item");
+            return;
+          }
+        }
+        showToast("해당 RSS 카드가 분류 슬라이더에 가려져 있을 수 있음");
+      }, 80);
+    });
+  });
+
+  // 후보/아카이브 버튼 핸들러 (yt)
+  grid.querySelectorAll("[data-yt-action]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const front = btn.dataset.ytFront;
+      const action = btn.dataset.ytAction;
+      const date = (data && data.date) || (document.getElementById("ytDateSel").value);
+      await callItemAction(action, `yt:${date}:${front}`);
+    });
+  });
+}
+
+document.getElementById("btn-refresh").addEventListener("click", async () => {
+  const latest = await loadDateList();
+  if (latest) await loadDaily(latest);
+  if (CURRENT_TAB === "youtube") await loadYtDates();
+  loadCandidatesPreview();
+  loadArchivedPreview();
+  loadWindowInfo();
+  loadYtWindowInfo();
+  showToast("새로고침");
+});
+
+// 초기 백엔드 헬스 체크
+(async () => {
+  try {
+    const r = await fetch(BACKEND + "/api/health");
+    if (r.ok) setRunStatus("백엔드 연결 OK");
+    else setRunStatus("백엔드 응답 이상");
+  } catch (e) {
+    setRunStatus("백엔드 미실행 - server.py를 켜세요");
+  }
+})();
+
+// 증분 모드 정보 표시 (마지막 실행 / 다음 윈도우)
+// 신호등: 다음 윈도우 시간에 따라 색상 결정
+function windowSignal(hours) {
+  if (hours == null) return {color: "var(--fg-dim)", title: "정보 없음"};
+  if (hours <= 12) return {color: "#5eead4", title: "방금 실행됨 — 또 안 돌려도 됨"};
+  if (hours <= 24) return {color: "#5eead4", title: "여유 있음"};
+  if (hours <= 48) return {color: "#fbbf24", title: "슬슬 돌릴 만함"};
+  if (hours < 336) return {color: "#f87171", title: "한참 안 돌렸음 — 돌릴 때 됐음"};
+  return {color: "#f87171", title: "안전 상한 14일 도달 — 빨리 돌리세요"};
+}
+
+async function loadWindowInfo() {
+  const last = document.getElementById("winLast");
+  if (!last) return;
+  try {
+    const r = await fetch(withCh(BACKEND + "/api/status"));
+    const s = await r.json();
+    const txt = s.hours_since_last != null ? `${s.hours_since_last}h 전` : "최초";
+    const sig = windowSignal(s.next_window_hours);
+    last.innerHTML = `${txt} <span class="win-dot" style="background:${sig.color};box-shadow:0 0 6px ${sig.color}" title="${sig.title}"></span>`;
+    if (s.window_note) {
+      const grp = document.getElementById("window-info-group");
+      if (grp) grp.title = s.window_note;
+    }
+  } catch (e) {
+    last.textContent = "—";
+  }
+}
+async function loadYtWindowInfo() {
+  const el = document.getElementById("ytWinLast");
+  if (!el) return;
+  try {
+    // 가장 최근 yt daily의 generated_at 사용
+    const dr = await fetch(withCh(BACKEND + "/api/youtube/dates"));
+    if (!dr.ok) throw new Error("no_dates");
+    const dates = (await dr.json()).dates || [];
+    if (!dates.length) { el.textContent = "최초"; return; }
+    const r = await fetch(withCh(BACKEND + "/api/youtube/" + dates[0]));
+    if (!r.ok) throw new Error("no_data");
+    const data = await r.json();
+    const ts = data.generated_at;
+    if (!ts) { el.textContent = "—"; return; }
+    const hours = (Date.now() - new Date(ts).getTime()) / 3600000;
+    const sig = windowSignal(hours);
+    el.innerHTML = `${hours.toFixed(1)}h 전 <span class="win-dot" style="background:${sig.color};box-shadow:0 0 6px ${sig.color}" title="${sig.title}"></span>`;
+  } catch (e) {
+    el.textContent = "—";
+  }
+}
+
+loadWindowInfo();
+loadYtWindowInfo();
+// 시간 단위 자동 갱신 (분단위는 과함)
+setInterval(() => { loadWindowInfo(); loadYtWindowInfo(); }, 60 * 60 * 1000);
+
+// === API 키 설정 모달 ===
+const KEYS_STORAGE = "newsradar_api_keys";
+
+function loadKeysFromStorage() {
+  try { return JSON.parse(localStorage.getItem(KEYS_STORAGE) || "{}"); }
+  catch { return {}; }
+}
+function saveKeysToStorage(keys) {
+  localStorage.setItem(KEYS_STORAGE, JSON.stringify(keys));
+}
+async function syncKeysToBackend(keys) {
+  try {
+    const r = await fetch(BACKEND + "/api/keys", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(keys),
+    });
+    return await r.json();
+  } catch (e) { return {error: e.message}; }
+}
+// --- 다중 YouTube 키 (프로필·API·사용량) ---
+// 저장 구조: keys.youtube_keys = [{profile, key}], (하위호환) keys.youtube = 단일 문자열
+function _ytKeysFromStorage() {
+  const k = loadKeysFromStorage();
+  if (Array.isArray(k.youtube_keys) && k.youtube_keys.length) return k.youtube_keys;
+  if (k.youtube) return [{ profile: "기본", key: k.youtube }];  // 구버전 마이그레이션
+  return [];
+}
+function ytKeyRowHtml(profile, key) {
+  return `<div class="yt-key-row">
+    <input class="k-prof" type="text" placeholder="계정 이름" value="${escapeHtml(profile || "")}">
+    <input class="k-key" type="password" placeholder="AIza..." value="${escapeHtml(key || "")}">
+    <span class="yt-key-use">—</span>
+    <button type="button" class="yt-key-del" title="삭제">✕</button>
+  </div>`;
+}
+function renderYtKeyList(rows) {
+  const list = document.getElementById("ytKeyList");
+  list.innerHTML = (rows.length ? rows : [{ profile: "", key: "" }])
+    .map(r => ytKeyRowHtml(r.profile, r.key)).join("");
+}
+function collectYtKeys() {
+  return [...document.querySelectorAll("#ytKeyList .yt-key-row")].map(row => ({
+    profile: row.querySelector(".k-prof").value.trim(),
+    key: row.querySelector(".k-key").value.trim(),
+  })).filter(r => r.key);
+}
+async function refreshYtKeyUsage() {
+  // 백엔드에서 키별 오늘 사용량(추정 유닛) + 소진 여부 조회
+  let usage = {};
+  try {
+    const r = await fetch(BACKEND + "/api/keys/usage");
+    if (r.ok) usage = await r.json();
+  } catch (e) {}
+  const rows = document.querySelectorAll("#ytKeyList .yt-key-row");
+  rows.forEach(row => {
+    const key = row.querySelector(".k-key").value.trim();
+    const el = row.querySelector(".yt-key-use");
+    const u = key ? usage[key.slice(-8)] : null;  // 백엔드는 키 뒤 8자로 식별
+    if (!u) { el.textContent = "—"; el.className = "yt-key-use"; return; }
+    if (u.exhausted) { el.textContent = "소진"; el.className = "yt-key-use exhausted"; }
+    else { el.textContent = `~${u.units.toLocaleString()}u`; el.className = "yt-key-use ok"; }
+  });
+}
+function openSettings() {
+  const keys = loadKeysFromStorage();
+  renderYtKeyList(_ytKeysFromStorage());
+  refreshYtKeyUsage();
+  document.getElementById("key-anthropic").value = keys.anthropic || "";
+  document.getElementById("status-youtube").textContent = "";
+  document.getElementById("status-anthropic").textContent = "";
+  document.getElementById("modal-settings").style.display = "flex";
+}
+document.getElementById("yt-key-add").onclick = () => {
+  document.getElementById("ytKeyList").insertAdjacentHTML("beforeend", ytKeyRowHtml("", ""));
+};
+document.getElementById("ytKeyList").addEventListener("click", (e) => {
+  const del = e.target.closest(".yt-key-del");
+  if (del) del.closest(".yt-key-row").remove();
+});
+function closeSettings() {
+  document.getElementById("modal-settings").style.display = "none";
+}
+document.getElementById("btn-show-candidates").onclick = () => {
+  loadCandidatesPreview();
+  document.getElementById("modal-candidates").style.display = "flex";
+};
+document.getElementById("btn-show-archived").onclick = () => {
+  loadArchivedPreview();
+  document.getElementById("modal-archived").style.display = "flex";
+};
+document.getElementById("btn-settings").onclick = openSettings;
+document.getElementById("btn-close-settings").onclick = closeSettings;
+document.querySelectorAll(".modal .eye").forEach(b => {
+  b.onclick = () => {
+    const tgt = document.getElementById(b.dataset.target);
+    tgt.type = tgt.type === "password" ? "text" : "password";
+  };
+});
+document.getElementById("btn-save-keys").onclick = async () => {
+  const ytKeys = collectYtKeys();
+  const keys = {
+    youtube_keys: ytKeys,
+    youtube: ytKeys[0]?.key || "",  // 하위호환: 단일 키 필드도 유지(첫 키)
+    anthropic: document.getElementById("key-anthropic").value.trim(),
+  };
+  saveKeysToStorage(keys);
+  const result = await syncKeysToBackend(keys);
+  if (result.error) {
+    setRunStatus("키 저장 실패: " + result.error);
+  } else {
+    setRunStatus(`키 저장 완료 (YouTube ${ytKeys.length}개)`);
+    refreshYtKeyUsage();
+    setTimeout(closeSettings, 700);
+  }
+};
+document.getElementById("btn-test-youtube").onclick = async () => {
+  const status = document.getElementById("status-youtube");
+  const ytKeys = collectYtKeys();
+  if (!ytKeys.length) { status.textContent = "키를 먼저 입력하세요"; status.className = "key-status error"; return; }
+  status.textContent = "전체 키 테스트 중...";
+  status.className = "key-status";
+  // 먼저 저장(동기화)해야 백엔드가 테스트 가능
+  const keys = { youtube_keys: ytKeys, youtube: ytKeys[0].key, anthropic: document.getElementById("key-anthropic").value.trim() };
+  saveKeysToStorage(keys);
+  await syncKeysToBackend(keys);
+  try {
+    const r = await fetch(BACKEND + "/api/keys/test", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({provider: "youtube", all: true}),
+    });
+    const data = await r.json();
+    if (data.results) {
+      const ok = data.results.filter(x => x.valid).length;
+      status.textContent = `✓ ${ok}/${data.results.length} 유효`;
+      status.className = ok === data.results.length ? "key-status ok" : "key-status error";
+      // 행별 결과 반영
+      const rows = document.querySelectorAll("#ytKeyList .yt-key-row");
+      rows.forEach(row => {
+        const key = row.querySelector(".k-key").value.trim();
+        const res = data.results.find(x => x.tail === key.slice(-8));
+        const el = row.querySelector(".yt-key-use");
+        if (res) { el.textContent = res.valid ? "✓유효" : "✗무효"; el.className = "yt-key-use " + (res.valid ? "ok" : "exhausted"); }
+      });
+    } else {
+      status.textContent = "✗ " + (data.error || "실패"); status.className = "key-status error";
+    }
+  } catch (e) {
+    status.textContent = "✗ 백엔드 미실행"; status.className = "key-status error";
+  }
+};
+document.getElementById("btn-clear-keys").onclick = async () => {
+  if (!confirm("저장된 모든 API 키를 삭제하시겠습니까?")) return;
+  saveKeysToStorage({});
+  await syncKeysToBackend({youtube_keys: [], youtube: null, anthropic: null});
+  renderYtKeyList([]);
+  document.getElementById("key-anthropic").value = "";
+  setRunStatus("키 전체 삭제됨");
+};
+// 페이지 로드 시 localStorage → 백엔드 자동 동기화
+(async () => {
+  const keys = loadKeysFromStorage();
+  if (keys.youtube || keys.anthropic) {
+    await syncKeysToBackend(keys);
+  }
+})();
+
+(async function init() {
+  await loadChannels();
+  await loadConfig();
+  buildFrontChips();
+  // 마지막 분석 시간 표시
+  loadWindowInfo();
+  loadYtWindowInfo();
+  // 백엔드에서 실행 중인 작업이 있으면 폴링 복구
+  await _recoverRunState(CURRENT_CHANNEL);
+  syncBtnProgressToChannel();
+  // RSS 데이터는 백그라운드로 미리 준비
+  const latest = await loadDateList();
+  loadDaily(latest);
+  loadCandidatesPreview();
+  loadArchivedPreview();
+  // 초기 진입 = 떡상 탭 (loadBreakout 내부에서 오늘 스냅샷 없으면 자동 보정 수집)
+  switchTab("breakout");
+})();
+</script>
+</body>
+</html>

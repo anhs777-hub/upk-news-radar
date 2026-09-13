@@ -1,0 +1,33 @@
+# 비밀 파일 — 절대 공개 금지
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+client_secret*.json
+token.json
+credentials.json
+
+# 가상환경
+.venv/
+venv/
+env/
+
+# Python 캐시
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# 수집 데이터·로그 (런타임 산출물)
+data/
+logs/
+*.log
+*.sqlite3
+*.db
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+._*
