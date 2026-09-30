@@ -463,6 +463,14 @@
         {
           "name": "우리집경제",
           "channel_id": "UCVtOCP92808Us1Nofbxpwuw"
+        },
+        {
+          "name": "이대표 경제학",
+          "channel_id": "UCGzCvCq2JuFlaC-OBMlZwug"
+        },
+        {
+          "name": "한반도 백과사전",
+          "channel_id": "UCFZHPrufdDE7AKeF7wule9A"
         }
       ],
       "auto_collect": true
